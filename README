@@ -1,0 +1,26 @@
+# SWS
+Simple Web Server
+
+
+V00802949
+B03
+
+I defined TRUE and FALSE to be 1 and 0 respectively to increase code readability; it also happens to be habit to return TRUE.
+
+The 4 global variables are global such that a few of the helper functions were easier to write.
+
+When select returns due to a message being recieved through the socket, an array of char * (arrRequest) is created and each section of the request string (method, uri, http version) are read into their respective slots in the array. Next the response string is initialized to contain "HTTP/1.0 " because that will be the basis of all responses. Each item in arrRequest is checked for validity and the remainder of the response string is appended to the original.
+
+The header is sent first for simplicities sake (always have to send it) followed by the file - if required.
+
+The included file 'test.sh' is a bash script that can be executed to run 5 test cases:
+	1. GET / HTTP/1.0\r\n\r\n
+	2. GET /nofile HTTP/1.0\r\n\r\n
+	3. GET / HTTP/1.1\r\n\r\n
+	4. GET /../sws_server.c HTTP/1.0\r\n\r\n
+	5. GET /AUTHORS.txt HTTP/1.0\r\n\r\n
+
+***** THE SERVER MUST BE LISTENING ON PORT 3080, AND BE HOSTING THE INCLUDED DIRECTORY 'public' IN ORDER FOR TESTS TO WORK.
+
+ ~ Cole Macdonald
+ 
