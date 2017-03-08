@@ -1,4 +1,4 @@
-//rdp_server.c
+//rdp_client.c
 
 #include <stdio.h>
 #include <errno.h>
@@ -14,8 +14,7 @@
 #include <time.h>
 #include <arpa/inet.h>
 #include <stdio.h>
-
-#include "helper.h"
+#include "helper.c"
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 //										CONSTANTS
@@ -26,14 +25,24 @@
 //									GLOBAL VARIABLES
 ////////////////////////////////////////////////////////////////////////////////////////////
 
-int sock;
-char * ip_s;
-char * port_s;
-char * ip_r;
-char * port_r;
-char * f_to_send;
-struct sockaddr_in sa;
+int 	sock;
+char * 	ip_r;
+char * 	port_r;
+char * 	file_save_name;
+struct 	sockaddr_in sa;
 
+int 	bytes_recv 			= 0;
+int 	unique_bytes_recv 	= 0;
+int 	packs_recv 			= 0;
+int 	unique_packs_recv 	= 0;
+int 	syn_packs_recv 		= 0;	
+int 	fin_packs_recv 		= 0;
+int 	rst_packs_recv 		= 0;
+int 	ack_packs_sent 		= 0;
+int 	rst_packs_sent 		= 0;
+int 	duration 			= 0;
+
+int 	state				= 0;
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 //									HELPER FUNCTIONS
@@ -63,7 +72,7 @@ int prepareSocket()
 	memset(&sa, 0, sizeof sa);
 	sa.sin_family = AF_INET;
 	sa.sin_addr.s_addr = htonl(INADDR_ANY);
-	sa.sin_port = htons( atoi( port_s ) ); //convert to int
+	sa.sin_port = htons( atoi( port_r ) ); //convert to int
 	fromlen = sizeof(sa);
 	//end of copy
 
@@ -76,22 +85,8 @@ int prepareSocket()
 	return TRUE;
 }
 
-int generateRandomSequenceNumber()
-{
-	int num;
-	srand(time(NULL));
-	num = rand();
-	num = num % 1000;
-	return num;
-}
-
 int establishConnection()
 {
-	char header[1000] = "CSC361 SYN \0"; //_seq _ackno _length _size\r\n\r\n"
-	int seq = generateRandomSequenceNumber();
-	strcat(header, itoa(seq));
-	strcat(header, " -1 1 0\0");
-	printf("%s\n", header);
 	return TRUE;
 }
 
@@ -100,32 +95,54 @@ int finishConnection()
 	return TRUE;
 }
 
+int typeToState(char * recv)
+{
+	/**
+	* recv ex: "CSC361 _type _seq _ackno _length _size\r\n\r\n"
+	*/
+	if(strcmp(recv, TYPES.data) == 0)
+	{
+		return 1;
+	} else if(strcmp(recv, TYPES.acknowledgement) == 0)
+	{
+		return 2;
+	} else if(strcmp(recv, TYPES.sync) == 0)
+	{
+		return 3;
+	} else if(strcmp(recv, TYPES.finish) == 0)
+	{
+		return 4;
+	} else if (strcmp(recv, TYPES.reset) == 0)
+	{
+		return 5;
+	} else 
+	{
+		return 0;
+	}
+
+}
+
+int sendAckPacket()
+{
+
+
+	return 1;
+}
 ////////////////////////////////////////////////////////////////////////////////////////////
 //										MAIN
 ////////////////////////////////////////////////////////////////////////////////////////////
 
-int main( int argc, char ** argv )
+int main (int argc, char ** argv)
 {
-	/*if( argc != 6)
+	/*if(argc != 4)
 	{
-		printf("Incorrect number of arguments. Run as follows:\n ./sws <port> <directory>\n");
-		return EXIT_FAILURE;
+		printf("Incorrect number of arguments, run as follows:\n./rdpr ")
+		return EXIT_FAILUE;
 	}*/
 
-	/*ip_s = argv[1];
-	port_s = argv[2];
-	ip_r = argv[3];
-	port_r = argv[4];
-	f_to_send = argv[5];*/
-
-	port_s = "8080";
-	f_to_send = "public/index.html";
-
-	if(!fileExists(f_to_send))
-	{
-		printf("does not exist\n");
-		return EXIT_FAILURE;
-	}
+	ip_r 			= ""; 			//argv[1];
+	port_r 			= "8080"; 		//argv[2];
+	file_save_name 	= "save.txt";	//argv[3];
 
 	if(!prepareSocket())
 	{
@@ -136,8 +153,7 @@ int main( int argc, char ** argv )
 	int select_result;
 	fd_set read_fds;
 
-	printf("rdp is running on UDP port %s\n", port_s);
-	establishConnection();
+	printf("rdpc is running on UDP port %s\n", port_r);
 
 	while (1)
 	{
@@ -161,11 +177,57 @@ int main( int argc, char ** argv )
 				printf("Error in select (-1). Continuing.\n");
 				break;
 			case 0:
-
+				//timeout
 				printf("Error in select (0). Continuing.\n");
 				break;
 			default:
 				//select returned properly
+				if(FD_ISSET(sock, &read_fds))
+				{
+					ssize_t recsize;
+					socklen_t fromlen = sizeof(sa);
+					char request[BUFFER_SIZE];
+
+					recsize = recvfrom(sock, (void*) request, sizeof request, 0, (struct sockaddr*)&sa, &fromlen);
+					if(recsize == -1)
+					{
+						//printf("Error occured.\n");
+						continue;
+					}
+
+					char * headerinfo[6];
+					//ex request: "CSC361 _type _seq _ackno _length _size\r\n\r\n"
+					if(!parse_packet(request, headerinfo))
+					{
+						//TODO: Failure
+						printf("Could not be properly parsed.");
+						continue;
+					}
+					state = typeToState(headerinfo[1]);
+					int seqn = atoi(headerinfo[2]);
+					int ackn = atoi(headerinfo[3]);
+					int length = atoi(headerinfo[4]);
+					int size = atoi(headerinfo[5]);
+
+					switch(state)
+					{
+						//DAT
+						case 1:
+						//ACK
+						case 2:
+						//SYN
+						case 3:
+						//FIN
+						case 4:
+						//RST
+						case 5:
+
+						//unknown state
+						default:
+					}
+				}
+
+
 				break;
 		}//end switch
 	}//end while
@@ -174,5 +236,3 @@ int main( int argc, char ** argv )
 
 	return EXIT_SUCCESS;
 }
-
-
