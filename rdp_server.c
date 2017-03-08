@@ -85,15 +85,24 @@ int generateRandomSequenceNumber()
 	return num;
 }
 
-int establishConnection()
+void generateHeader(char * headerbuffer)
 {
 	char header[1000] = "CSC361 SYN \0"; //_seq _ackno _length _size\r\n\r\n"
 	int seq = generateRandomSequenceNumber();
 	char seqstr[4];
 	sprintf(seqstr, "%d", seq);
 	strcat(header, seqstr);
-	strcat(header, " -1 1 0\0");
+	strcat(header, " -1 1 0\r\n\r\n\0");
+
+	strcpy(headerbuffer, header);
+}
+
+int establishConnection()
+{
+	char header[1000];
+	generateHeader(header);
 	printf("%s\n", header);
+
 	return TRUE;
 }
 
