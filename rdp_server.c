@@ -89,7 +89,8 @@ int establishConnection()
 {
 	char header[1000] = "CSC361 SYN \0"; //_seq _ackno _length _size\r\n\r\n"
 	int seq = generateRandomSequenceNumber();
-	char seqstr[4] = itoa(seq);
+	char seqstr[4];
+	sprintf(seqstr, "%d", seq);
 	strcat(header, seqstr);
 	strcat(header, " -1 1 0\0");
 	printf("%s\n", header);
