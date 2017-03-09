@@ -201,7 +201,7 @@ int main (int argc, char ** argv)
 			case 1:
 				//read in
 				printf("parse_packet_payload:\n");
-				parse_packet_payload(tmp, recvbuffer);
+				parse_packet_payload(request, recvbuffer);
 				//ack
 				//sendAckPacket(seqn, length, window);
 				break;
