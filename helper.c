@@ -159,11 +159,11 @@ int parse_packet(char * recv, char ** buffer)
 		token = strtok(NULL, s);
 		i++;
 	}
-
+	printf("end while\n");
 	if(token != NULL || i != 5)
-		return 0;
+		return FALSE;
 	else
-		return 1;
+		return TRUE;
 }
 
 int directoryExists(char * directory)
