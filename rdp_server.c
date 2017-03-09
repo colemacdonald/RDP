@@ -192,7 +192,7 @@ int sendDataPacket(int seqn, int length)
 	return TRUE;
 }
 
-void generateHeaderFIN(int seqn, headerbuffer)
+void generateHeaderFIN(int seqn, char * headerbuffer)
 {
 	char header[1000] = "CSC361 FIN \0";
 
