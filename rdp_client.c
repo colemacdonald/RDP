@@ -101,16 +101,16 @@ void generateAckHeader(char * headerbuffer, int ackn)
 	char header[1000] = "CSC361 ACK -1 \0"; //CSC361 _type _seq _ackno _length _size\r\n\r\n"
 
 	char ackstr[4];
-	sprintf(ackstr, "%d", seq);
+	sprintf(ackstr, "%d", ackn);
 	strcat(header, ackstr);
 	strcat(header, " 1 0\r\n\r\n\0");
 
 	strcpy(headerbuffer, header);
 }
 
-int sendAckPacket(int seqn, int length)
+int sendAckPacket(int seqn, int length, int window)
 {
-	char * header[1000];
+	char header[1000];
 	int ackn = seqn + length;
 
 	generateAckHeader(header, ackn);
@@ -243,6 +243,7 @@ int main (int argc, char ** argv)
 							break;
 						//unknown state
 						default:
+							break;
 					}
 				}
 

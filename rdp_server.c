@@ -79,7 +79,7 @@ int prepareSocket()
 
 	memset(&sa, 0, sizeof sa);
 	sa.sin_family = AF_INET;
-	sa.sin_addr.s_addr = htonl(ip_r);
+	sa.sin_addr.s_addr = htonl( atoi(ip_r) );
 	sa.sin_port = htons( atoi( port_s ) ); //convert to int
 	fromlen = sizeof(sa);
 	//end of copy
@@ -137,7 +137,7 @@ void generateHeaderDAT(char * headerbuffer, int seqn, int length)
 
 	char lenstr[10];
 	sprintf(lenstr, "%d", length);
-	strcat(header, lenstr)
+	strcat(header, lenstr);
 
 	// only one way, no window
 	strcat(header,  "0\r\n\r\n\0");
@@ -172,7 +172,7 @@ int sendDataPacket(int seqn, int length)
 
 	//append data to header
 	//sendto(sock, header, strlen(header), 0, (struct sockaddr*)&sa, sizeof sa);
-	total_bytes_sent += length;
+	total_data_bytes_sent += length;
 
 	if(unique_packet())
 	{
@@ -279,7 +279,7 @@ int main( int argc, char ** argv )
 						printf("Could not be properly parsed.");
 						continue;
 					}
-					state = typeToState(headerinfo[1]);
+					int state = typeToState(headerinfo[1]);
 					int seqn = atoi(headerinfo[2]);
 					int ackn = atoi(headerinfo[3]);
 					int length = atoi(headerinfo[4]);
@@ -320,13 +320,9 @@ int main( int argc, char ** argv )
 
 						//unknown state
 						default:
-					}
-				}
-
-
-				break;
-		}//end switch
-				break;
+							break;
+					}//end switch
+				}//end if
 		}//end switch
 	}//end while
 

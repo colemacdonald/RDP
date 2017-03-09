@@ -1,5 +1,7 @@
 all: sws_server.c
-	gcc sws_server.c -o sws
+	gcc rdp_server.c helper.c -o rdps
+	gcc rdp_client.c -o rdpr
 
 clean:
-	rm sws
+	rm rdps
+	rm rdpr
