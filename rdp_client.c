@@ -72,7 +72,7 @@ int prepareSocket()
 
 	memset(&sa, 0, sizeof sa);
 	sa.sin_family = AF_INET;
-	sa.sin_addr.s_addr = htonl(INADDR_ANY);
+	sa.sin_addr.s_addr = htonl( atoi(ip_r) );
 	sa.sin_port = htons( atoi( port_r ) ); //convert to int
 	fromlen = sizeof(sa);
 	//end of copy
@@ -139,9 +139,9 @@ int main (int argc, char ** argv)
 		return EXIT_FAILUE;
 	}*/
 
-	ip_r 			= ""; 			//argv[1];
-	port_r 			= "8080"; 		//argv[2];
-	file_save_name 	= "save.txt";	//argv[3];
+	ip_r 			= "10.10.1.100";	//argv[1];
+	port_r 			= "8080"; 			//argv[2];
+	file_save_name 	= "save.txt";		//argv[3];
 
 	if(!prepareSocket())
 	{
