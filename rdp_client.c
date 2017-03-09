@@ -178,7 +178,7 @@ int main (int argc, char ** argv)
 			continue;
 		}
 
-		//printf("%s\n", request);
+		printf("recvd: %s\n", request);
 
 		char * headerinfo[4];
 
