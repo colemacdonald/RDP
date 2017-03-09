@@ -155,16 +155,10 @@ int parse_packet(char * recv, char ** buffer)
 	while(token != NULL && i < 5)
 	{
 		buffer[i] = token;
-		printf("%s\n", token);
 		token = strtok(NULL, s);
 		i++;
 	}
-	printf("end while: %d\n", i);
-
-	if(token != NULL || i != 5)
-		return FALSE;
-	else
-		return TRUE;
+	return TRUE;
 }
 
 int directoryExists(char * directory)

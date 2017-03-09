@@ -177,12 +177,13 @@ int main (int argc, char ** argv)
 		strcpy(tmp, request);
 
 		printf("parse\n");
-		if(!parse_packet(tmp, headerinfo))
+		parse_packet(tmp, headerinfo);
+		/*if(!parse_packet(tmp, headerinfo))
 		{
 			//TODO: Failure
 			printf("Could not be properly parsed.");
 			continue;
-		}
+		}*/
 
 		printf("end parse\n");
 		state = typeToState(headerinfo[1]);
