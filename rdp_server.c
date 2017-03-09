@@ -142,7 +142,7 @@ void generateHeaderDAT(char * headerbuffer, int seqn, int length)
 	strcat(header, lenstr);
 
 	// only one way, no window
-	strcat(header,  "0\r\n\r\n\0");
+	strcat(header,  "0\r\n\r\n");
 
 	strcpy(headerbuffer, header);
 }
