@@ -72,7 +72,7 @@ int prepareSocket()
 
 	memset(&sa, 0, sizeof sa);
 	sa.sin_family = AF_INET;
-	sa.sin_addr.s_addr = htonl( atoi(ip_r) );
+	sa.sin_addr.s_addr = htonl( INADDR_ANY );
 	sa.sin_port = htons( atoi( port_r ) ); //convert to int
 	fromlen = sizeof(sa);
 	//end of copy
