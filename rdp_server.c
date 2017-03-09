@@ -128,9 +128,9 @@ void generateHeaderSYN(char * headerbuffer)
 
 void generateHeaderDAT(char * headerbuffer, int seqn, int length)
 {
-	char header[1000] = "CSC361 DAT "; //_seq _ackno _length _size\r\n\r\n"
+	char header[1000] = "CSC361 DAT \0"; //_seq _ackno _length _size\r\n\r\n"
 
-	char seqstr[4];
+	char seqstr[10];
 	sprintf(seqstr, "%d ", seqn);
 	strcat(header, seqstr);
 
