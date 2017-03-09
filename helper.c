@@ -159,7 +159,8 @@ int parse_packet(char * recv, char ** buffer)
 		token = strtok(NULL, s);
 		i++;
 	}
-	printf("end while\n");
+	printf("end while: %d\n", i);
+
 	if(token != NULL || i != 5)
 		return FALSE;
 	else
