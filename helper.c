@@ -164,6 +164,15 @@ int parse_packet_header(char * recv, char ** buffer)
 	return TRUE;
 }
 
+int parse_packet_payload(char * recv, char ** buffer)
+{
+	int pos = strcspn(recv, "\r\n\r\n");
+	printf("payload: %s\n", &recv[pos]);
+
+
+	return TRUE;
+}
+
 int directoryExists(char * directory)
 {
 	DIR* dir = opendir(directory);

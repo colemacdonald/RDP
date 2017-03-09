@@ -20,6 +20,7 @@
 //										CONSTANTS
 ////////////////////////////////////////////////////////////////////////////////////////////
 
+#define RECV_BUFFER_SIZE 4096
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 //									GLOBAL VARIABLES
@@ -160,6 +161,8 @@ int main (int argc, char ** argv)
 	int select_result;
 	fd_set read_fds;
 
+	char * recvbuffer[RECV_BUFFER_SIZE];
+
 	printf("rdpc is running on UDP port %s\n", port_r);
 
 	while (1)
@@ -197,6 +200,7 @@ int main (int argc, char ** argv)
 			//DAT
 			case 1:
 				//read in
+				parse_packet_payload(tmp, recvbuffer);
 				//ack
 				sendAckPacket(seqn, length, window);
 				break;

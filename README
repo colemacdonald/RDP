@@ -9,12 +9,10 @@ DESIGN:
 
 P2A: project design + IMPLEMENTATION of connection management (handshake)
 
-
-Dr. Pan Q's:
 1. How do you design and implement your RDP header and header fields? Do you use any additional header fields?
 
 The RDP Header appears as follows:
-	"CSC361 _type _seq _ackno _length _size\r\n\r\n"
+	"CSC361 _type _num1 _num2\r\n\r\n"
 
 	The type field will be one of the following strings and corresponds to the type of packet:
 		1. SYN
@@ -23,11 +21,7 @@ The RDP Header appears as follows:
 		4. RST
 		5. FIN
 
-	Only one of _seq and _ackno is relavent (_seq for SYN, DAT, FIN; _ackno for ACK, RST), the other will come in as -1 to signify that it need not be taken into account.
-
-	The _length field corresponds to the size of the packet (minus the header), for SYN packets, the length will be 1, for DAT packets, the length will be the size of the payload, and for ACK packets the length will be 0.
-
-	Since RDP is a unidirectional protocol, the sender never has to worry about a reciever buffer and thus the _size (which corresponds to the window size) will always be 0 for packets from the sender and the window_size value for packets from the reciever.
+	For packets from the sender, num1 will correspond to the sequence number and num2 will correspond to the payload length. On the other hand, for packets from the sender, num1 and num2 will correspond to the acknowledgement number and the window size respectively. The header is designed this way as to be as small as possible.
 
 
 
@@ -38,7 +32,8 @@ The designed connection establishment is implemented as a two-way handshake and 
 	2. Reciever responds with an ACK packet
 	3. Server may now begin sending data
 
-The designed connection finish
+The designed connection finish ... :
+
 
 	The initial sequence number is chosen randomly as to avoid collisions with any services that may have previously used the same port and ip.
 

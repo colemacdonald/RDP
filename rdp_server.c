@@ -179,7 +179,16 @@ int sendDataPacket(int seqn, int length)
 	generateHeaderDAT(header, seqn, length);
 
 	//append data to header
-	//sendto(sock, header, strlen(header), 0, (struct sockaddr*)&sa, sizeof sa);
+
+	strcat(header, "This is the payload data\0");
+	int s = sendto(sock, header, strlen(header) + 1, 0, (struct sockaddr*)&sa_r, sizeof sa_r);
+	if(s < 0)
+	{
+		//TODO: Failure
+		printf("Could not send SYN, errno = %d\n", errno);
+		return FALSE;
+	}
+
 	total_data_bytes_sent += length;
 
 	if(unique_packet())
@@ -284,7 +293,7 @@ int main( int argc, char ** argv )
 			//ACK
 			case 2:
 				//send data packet
-				//sendDataPacket(seqn, length);
+				sendDataPacket(ackn, size);//seqn, length);
 				break;
 
 			//SYN

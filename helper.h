@@ -38,6 +38,8 @@ void parse_request(char * request_string, char ** buffer);
 
 int parse_packet_header(char * recv, char ** buffer);
 
+int parse_packet_payload(char * recv, char ** buffer);
+
 int directoryExists(char * directory);
 
 void printLogString(char * request, char * response, struct sockaddr_in sa, char * file);
