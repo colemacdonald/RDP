@@ -155,20 +155,32 @@ int main (int argc, char ** argv)
 	printf("rdpc is running on UDP port %s\n", port_r);
 
 	while (1)
-	{
+	{	
+		ssize_t recsize;
+		socklen_t fromlen = sizeof(sa);
+		char request[BUFFER_SIZE];
+
+		recsize = recvfrom(sock, (void*) request, sizeof request, 0, (struct sockaddr*)&sa, &fromlen);
+		if(recsize < 0)
+		{
+			printf("Error occured.\n");
+			continue;
+		}
+
+		printf("%s\n", request);
 		//ensure stdin does not unneccesarily trigger select
-		fflush(STDIN_FILENO);
+		// fflush(STDIN_FILENO);
 
-		//prepare the fd_set
-		FD_ZERO( &read_fds );
+		// //prepare the fd_set
+		// FD_ZERO( &read_fds );
 
-		//time out counter -> use select timeout?
-		//FD_SET( STDIN_FILENO, &read_fds );
-		FD_SET( sock, &read_fds );
+		// //time out counter -> use select timeout?
+		// //FD_SET( STDIN_FILENO, &read_fds );
+		// FD_SET( sock, &read_fds );
 
 		//replace (i think) final NULL with timeout value;
-		select_result = select( sock + 1, &read_fds, NULL, NULL, NULL /*timeout*/);
-		printf("select = %d\n", select_result);
+		// select_result = select( sock + 1, &read_fds, NULL, NULL, NULL /*timeout*/);
+		// printf("select = %d\n", select_result);
 		switch( select_result )
 		{
 			case -1:
