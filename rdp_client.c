@@ -117,7 +117,7 @@ int sendAckPacket(int seqn, int length, int window)
 
 	printf("Sending:\n%s\n", header);
 
-	if(sendto(sock, header, strlen(header), 0, (struct sockaddr*)&sa, sizeof sa) < 0)
+	if(sendto(sock, header, strlen(header) + 1, 0, (struct sockaddr*)&sa, sizeof sa) < 0)
 	{
 		printf("Could not send ack, errno: %d", errno);
 	}
