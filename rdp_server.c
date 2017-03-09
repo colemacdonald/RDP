@@ -160,7 +160,7 @@ int sendSYN()
 	generateHeaderSYN(header);
 	printf("%s\n", header);
 
-	int s = sendto(sock, header, strlen(header), 0, (struct sockaddr*)&sa_r, sizeof sa_r);
+	int s = sendto(sock, header, strlen(header) + 1, 0, (struct sockaddr*)&sa_r, sizeof sa_r);
 	if(s < 0)
 	{
 		//TODO: Failure
