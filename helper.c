@@ -152,7 +152,7 @@ int parse_packet(char * recv, char ** buffer)
 	char * token = strtok(recv, s);
 
 	int i = 0;
-	while(token != NULL && i < 6)
+	while(token != NULL && i < 5)
 	{
 		buffer[i] = token;
 		printf("%s\n", token);
