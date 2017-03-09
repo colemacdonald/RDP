@@ -117,7 +117,10 @@ int sendAckPacket(int seqn, int length, int window)
 
 	printf("Sending: %s\n", header);
 
-	sendto(sock, header, strlen(header), 0, (struct sockaddr*)&sa, sizeof sa);
+	if(sendto(sock, header, strlen(header), 0, (struct sockaddr*)&sa, sizeof sa) < 0)
+	{
+		printf("Could not send ack, errno: %d", errno);
+	}
 	ack_packs_sent += 1;
 	last_ack = ackn;
 
