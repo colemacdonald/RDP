@@ -116,7 +116,7 @@ void generateHeaderSYN(char * headerbuffer)
 	char header[1000] = "CSC361 SYN \0"; //_seq _ackno _length _size\r\n\r\n"
 	int seqn = generateRandomSequenceNumber();
 	seq0 = seqn;
-	char seqstr[4];
+	char seqstr[10];
 	sprintf(seqstr, "%d", seqn);
 	strcat(header, seqstr);
 
@@ -155,11 +155,9 @@ int sendSYN()
 	generateHeaderSYN(header);
 	//printf("%s\n", header);
 
-	int s = sendto(sock, header, strlen(header) + 1, 0, (struct sockaddr*)&sa_r, sizeof sa_r);
-	if(s < 0)
+	if(!sendPacket(header))
 	{
-		//TODO: Failure
-		printf("Could not send SYN, errno = %d\n", errno);
+		printf("Could not send SYN, errno: %d\n", errno);
 		return FALSE;
 	}
 
@@ -174,13 +172,11 @@ int sendDataPacket(int seqn, int length)
 	generateHeaderDAT(header, seqn, length);
 
 	//append data to header
-
 	strcat(header, "This is the payload data\0");
-	int s = sendto(sock, header, strlen(header) + 1, 0, (struct sockaddr*)&sa_r, sizeof sa_r);
-	if(s < 0)
+	
+	if(!sendPacket(header))
 	{
-		//TODO: Failure
-		printf("Could not send SYN, errno = %d\n", errno);
+		printf("Could not send DAT packet, errno: %d", errno);
 		return FALSE;
 	}
 
@@ -193,6 +189,43 @@ int sendDataPacket(int seqn, int length)
 	}
 
 	total_data_packs_sent += 1;
+	return TRUE;
+}
+
+void generateHeaderFIN(int seqn, headerbuffer)
+{
+	char header[1000] = "CSC361 FIN \0";
+
+	char seqstr[10];
+	sprintf(seqstr, "%d", seqn);
+	strcat(header, seqstr);
+
+	// finlen = 1
+	strcat(header, " 1\r\n\r\n\0");
+
+	strcpy(headerbuffer, header);
+}
+
+int sendPacket(char * data)
+{
+	int s = sendto(sock, data, strlen(data) + 1, 0, (struct sockaddr*)&sa_r, sizeof sa_r);
+	if(s < 0)
+	{
+		return FALSE;
+	}
+	return TRUE;
+}
+
+int sendFIN(int seqn)
+{
+	char header[1000];
+	generateHeaderFIN(seqn, header);
+
+	if(!sendPacket(header))
+	{
+		printf("Could not send FIN, errno = %d\n", errno);
+		return FALSE;
+	}
 	return TRUE;
 }
 

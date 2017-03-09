@@ -38,7 +38,7 @@ void parse_request(char * request_string, char ** buffer);
 
 int parse_packet_header(char * recv, char ** buffer);
 
-int parse_packet_payload(char * recv, char ** buffer);
+int parse_packet_payload(char * recv, char * buffer);
 
 int directoryExists(char * directory);
 

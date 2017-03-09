@@ -200,7 +200,6 @@ int main (int argc, char ** argv)
 			//DAT
 			case 1:
 				//read in
-				printf("parse_packet_payload:\n");
 				parse_packet_payload(request, recvbuffer);
 				//ack
 				//sendAckPacket(seqn, length, window);
