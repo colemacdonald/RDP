@@ -190,7 +190,7 @@ int main (int argc, char ** argv)
 					recsize = recvfrom(sock, (void*) request, sizeof request, 0, (struct sockaddr*)&sa, &fromlen);
 					if(recsize == -1)
 					{
-						//printf("Error occured.\n");
+						printf("Error occured.\n");
 						continue;
 					}
 
