@@ -161,7 +161,7 @@ int main (int argc, char ** argv)
 	int select_result;
 	fd_set read_fds;
 
-	char * recvbuffer[RECV_BUFFER_SIZE];
+	char recvbuffer[RECV_BUFFER_SIZE];
 
 	printf("rdpc is running on UDP port %s\n", port_r);
 
