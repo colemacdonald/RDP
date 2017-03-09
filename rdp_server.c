@@ -80,7 +80,7 @@ int prepareSocket()
 
 	memset(&sa_s, 0, sizeof sa_s);
 	sa_s.sin_family = AF_INET;
-	sa_s.sin_addr.s_addr = htonl( atoi(ip_s) );
+	sa_s.sin_addr.s_addr = inet_addr(ip_s);//htonl( atoi(ip_s) );
 	sa_s.sin_port = htons( atoi( port_s ) ); //convert to int
 	fromlen = sizeof(sa_s);
 	//end of copy
@@ -242,10 +242,10 @@ int main( int argc, char ** argv )
 	while (1)
 	{
 		ssize_t recsize;
-		socklen_t fromlen = sizeof(sa_r);
+		socklen_t fromlen = sizeof(sa_s);
 		char request[BUFFER_SIZE];
 
-		recsize = recvfrom(sock, (void*) request, sizeof request, 0, (struct sockaddr*)&sa_r, &fromlen);
+		recsize = recvfrom(sock, (void*) request, sizeof request, 0, (struct sockaddr*)&sa_s, &fromlen);
 		if(recsize == -1)
 		{
 			//printf("Error occured.\n");
