@@ -84,12 +84,13 @@ int prepareSocket()
 	fromlen = sizeof(sa);
 	//end of copy
 
-	/*if(connect(sock, (struct sockaddr *) &sa, sizeof sa) != 0)
+	if(connect(sock, (struct sockaddr *) &sa, sizeof sa) != 0)
 	{
 		printf("Could not connect to receiver socket\n");
+		printf("%d\n", errno);
 		close(sock);
 		return FALSE;
-	}*/
+	}
 
 	/*if(bind(sock, (struct sockaddr *) &sa, sizeof sa) != 0)
 	{
