@@ -121,7 +121,7 @@ void generateHeaderSYN(char * headerbuffer)
 	strcat(header, seqstr);
 
 	// no ackno, synlen = 1, no window
-	strcat(header, " -1 1 0\r\n\r\n\0");
+	strcat(header, " 1\r\n\r\n\0");
 
 	strcpy(headerbuffer, header);
 }
