@@ -72,7 +72,7 @@ int prepareSocket()
 
 	memset(&sa, 0, sizeof sa);
 	sa.sin_family = AF_INET;
-	sa.sin_addr.s_addr = htonl( INADDR_ANY );
+	sa.sin_addr.s_addr = inet_addr(ip_r);  //htonl( INADDR_ANY );
 	sa.sin_port = htons( atoi( port_r ) ); //convert to int
 	fromlen = sizeof(sa);
 	//end of copy
@@ -176,7 +176,6 @@ int main (int argc, char ** argv)
 		char tmp[strlen(request) + 1];
 		strcpy(tmp, request);
 
-		printf("parse\n");
 		parse_packet(tmp, headerinfo);
 		/*if(!parse_packet(tmp, headerinfo))
 		{
@@ -184,8 +183,6 @@ int main (int argc, char ** argv)
 			printf("Could not be properly parsed.");
 			continue;
 		}*/
-
-		printf("end parse\n");
 		state = typeToState(headerinfo[1]);
 
 		printf("state = %d\n", state);
