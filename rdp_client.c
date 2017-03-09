@@ -173,6 +173,7 @@ int main (int argc, char ** argv)
 
 		char * headerinfo[6];
 
+		printf("parse\n");
 		if(!parse_packet(request, headerinfo))
 		{
 			//TODO: Failure
