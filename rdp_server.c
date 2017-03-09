@@ -32,7 +32,8 @@ char * 	port_s;
 char * 	ip_r;
 char * 	port_r;
 char * 	f_to_send;
-struct 	sockaddr_in sa;
+struct 	sockaddr_in sa_s;
+struct 	sockaddr_in sa_r;
 
 int 	total_data_bytes_sent 	= 0;
 int 	unique_data_bytes_sent 	= 0;
@@ -77,27 +78,26 @@ int prepareSocket()
 
 	//TODO: Use reciever port and ip, connect instead of bind
 
-	memset(&sa, 0, sizeof sa);
-	sa.sin_family = AF_INET;
-	sa.sin_addr.s_addr = htonl( atoi(ip_r) );
-	sa.sin_port = htons( atoi( port_s ) ); //convert to int
-	fromlen = sizeof(sa);
+	memset(&sa_s, 0, sizeof sa_s);
+	sa_s.sin_family = AF_INET;
+	sa_s.sin_addr.s_addr = htonl( atoi(ip_s) );
+	sa_s.sin_port = htons( atoi( port_s ) ); //convert to int
+	fromlen = sizeof(sa_s);
 	//end of copy
 
-	if(connect(sock, (struct sockaddr *) &sa, sizeof sa) != 0)
-	{
-		printf("Could not connect to receiver socket\n");
-		printf("%d\n", errno);
-		close(sock);
-		return FALSE;
-	}
-
-	/*if(bind(sock, (struct sockaddr *) &sa, sizeof sa) != 0)
+	if(bind(sock, (struct sockaddr *) &sa_s, sizeof sa_s) != 0)
 	{
 		printf("socket could not be bound\n");
 		close(sock);
 		return FALSE;
-	}*/
+	}
+
+	// prep sa_r
+	memset(&sa_r, 0, sizeof sa_r);
+	sa_r.sin_family = AF_INET;
+	sa_r.sin_addr.s_addr = htonl( atoi(ip_s) );
+	sa_r.sin_port = htons( atoi( port_s ) );
+
 	return TRUE;
 }
 
@@ -159,7 +159,7 @@ int sendSYN()
 	generateHeaderSYN(header);
 	printf("%s\n", header);
 
-	int s = sendto(sock, header, strlen(header), 0, (struct sockaddr*)&sa, sizeof sa);
+	int s = sendto(sock, header, strlen(header), 0, (struct sockaddr*)&sa_r, sizeof sa_r);
 
 	printf("sendto return: %d\n", s);
 	printf("%d\n",errno);
@@ -264,10 +264,10 @@ int main( int argc, char ** argv )
 				if(FD_ISSET(sock, &read_fds))
 				{
 					ssize_t recsize;
-					socklen_t fromlen = sizeof(sa);
+					socklen_t fromlen = sizeof(sa_s);
 					char request[BUFFER_SIZE];
 
-					recsize = recvfrom(sock, (void*) request, sizeof request, 0, (struct sockaddr*)&sa, &fromlen);
+					recsize = recvfrom(sock, (void*) request, sizeof request, 0, (struct sockaddr*)&sa_s, &fromlen);
 					if(recsize == -1)
 					{
 						//printf("Error occured.\n");
