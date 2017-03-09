@@ -181,6 +181,8 @@ int main (int argc, char ** argv)
 		}
 
 		state = typeToState(headerinfo[1]);
+
+		printf("state = %d\n", state);
 		int seqn = atoi(headerinfo[2]);
 		int ackn = atoi(headerinfo[3]);
 		int length = atoi(headerinfo[4]);
