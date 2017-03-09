@@ -93,9 +93,10 @@ int prepareSocket()
 	}
 
 	// prep sa_r
+
 	memset(&sa_r, 0, sizeof sa_r);
 	sa_r.sin_family = AF_INET;
-	sa_r.sin_addr.s_addr = htonl( atoi(ip_r) );
+	sa_r.sin_addr.s_addr = inet_addr(ip_r);
 	sa_r.sin_port = htons( atoi( port_r ) );
 
 	return TRUE;
