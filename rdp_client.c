@@ -178,7 +178,7 @@ int main (int argc, char ** argv)
 			continue;
 		}
 
-		printf("%s\n", request);
+		//printf("%s\n", request);
 
 		char * headerinfo[4];
 
@@ -189,7 +189,7 @@ int main (int argc, char ** argv)
 
 		state = typeToState(headerinfo[1]);
 
-		printf("state = %d\n", state);
+		//printf("state = %d\n", state);
 		int seqn = atoi(headerinfo[2]);
 		int length = atoi(headerinfo[3]);
 
@@ -202,7 +202,7 @@ int main (int argc, char ** argv)
 				//read in
 				parse_packet_payload(tmp, recvbuffer);
 				//ack
-				sendAckPacket(seqn, length, window);
+				//sendAckPacket(seqn, length, window);
 				break;
 			//ACK
 			case 2:
