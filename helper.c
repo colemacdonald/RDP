@@ -166,11 +166,11 @@ int parse_packet_header(char * recv, char ** buffer)
 
 int parse_packet_payload(char * recv, char ** buffer)
 {
-	printf("in payload parser\n");
+	printf("in payload parser with recv: %s\n", recv);
 	int pos = strcspn(recv, "\r\n");
-	printf("pos = %d", pos);
+	printf("pos = %d\n", pos);
 	int len = strlen(recv) - pos;
-	printf("len: %d", len);
+	printf("len: %d\n", len);
 
 	/*char dst[len + 1];
 	strncpy(dst, &recv[pos], len);
