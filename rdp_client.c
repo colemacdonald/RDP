@@ -115,6 +115,8 @@ int sendAckPacket(int seqn, int length, int window)
 
 	generateAckHeader(header, ackn);
 
+	printf("Sending: %s\n", header);
+
 	sendto(sock, header, strlen(header), 0, (struct sockaddr*)&sa, sizeof sa);
 	ack_packs_sent += 1;
 	last_ack = ackn;
