@@ -256,12 +256,19 @@ int main( int argc, char ** argv )
 
 		char * headerinfo[6];
 		//ex request: "CSC361 _type _seq _ackno _length _size\r\n\r\n"
-		if(!parse_packet(request, headerinfo))
+		/*if(!parse_packet(request, headerinfo))
 		{
 			//TODO: Failure
 			printf("Could not be properly parsed.");
 			continue;
-		}
+		}*/
+
+		char tmp[strlen(request) + 1];
+		strcpy(tmp, request);
+
+		parse_packet(tmp, headerinfo);
+
+
 		int state = typeToState(headerinfo[1]);
 		int seqn = atoi(headerinfo[2]);
 		int ackn = atoi(headerinfo[3]);
