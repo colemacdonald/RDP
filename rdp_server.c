@@ -236,7 +236,7 @@ int main( int argc, char ** argv )
 	int select_result;
 	fd_set read_fds;
 
-	printf("rdp is running on UDP port %s\n", port_s);
+	printf("rdps is running on UDP %s:%s\n", ip_s, port_s);
 	sendSYN();
 
 	while (1)
@@ -254,7 +254,9 @@ int main( int argc, char ** argv )
 
 		printf("%s\n", request);
 
-		char * headerinfo[6];
+
+		// TODO: shorten header -> no point in sending seqn or length from recvr
+		char * headerinfo[4];
 		//ex request: "CSC361 _type _seq _ackno _length _size\r\n\r\n"
 		/*if(!parse_packet(request, headerinfo))
 		{
@@ -266,14 +268,11 @@ int main( int argc, char ** argv )
 		char tmp[strlen(request) + 1];
 		strcpy(tmp, request);
 
-		parse_packet(tmp, headerinfo);
-
+		parse_packet_header(tmp, headerinfo);
 
 		int state = typeToState(headerinfo[1]);
-		int seqn = atoi(headerinfo[2]);
-		int ackn = atoi(headerinfo[3]);
-		int length = atoi(headerinfo[4]);
-		int size = atoi(headerinfo[5]);
+		int ackn = atoi(headerinfo[2]);
+		int size = atoi(headerinfo[3]);
 
 		switch(state)
 		{
@@ -285,7 +284,7 @@ int main( int argc, char ** argv )
 			//ACK
 			case 2:
 				//send data packet
-				sendDataPacket(seqn, length);
+				//sendDataPacket(seqn, length);
 				break;
 
 			//SYN

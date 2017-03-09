@@ -36,7 +36,7 @@ int checkHTTPVersion(char * version);
 
 void parse_request(char * request_string, char ** buffer);
 
-int parse_packet(char * recv, char ** buffer);
+int parse_packet_header(char * recv, char ** buffer);
 
 int directoryExists(char * directory);
 

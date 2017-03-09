@@ -96,14 +96,17 @@ int finishConnection()
 	return TRUE;
 }
 
-void generateAckHeader(char * headerbuffer, int ackn)
+void generateAckHeader(char * headerbuffer, int ackn, int window)
 {
-	char header[1000] = "CSC361 ACK -1 \0"; //CSC361 _type _seq _ackno _length _size\r\n\r\n"
+	char header[1000] = "CSC361 ACK \0"; //CSC361 _type _ackno _size\r\n\r\n"
 
-	char ackstr[4];
+	char ackstr[10];
+	char winstr[10];
 	sprintf(ackstr, "%d", ackn);
+	sprintf(winstr, " %d", window);
 	strcat(header, ackstr);
-	strcat(header, " 1 0\r\n\r\n\0");
+	strcat(header, winstr);
+	strcat(header, "\r\n\r\n\0");
 
 	strcpy(headerbuffer, header);
 }
@@ -113,7 +116,7 @@ int sendAckPacket(int seqn, int length, int window)
 	char header[1000];
 	int ackn = seqn + length;
 
-	generateAckHeader(header, ackn);
+	generateAckHeader(header, ackn, window);
 
 	printf("Sending:\n%s\n", header);
 
@@ -174,25 +177,18 @@ int main (int argc, char ** argv)
 
 		printf("%s\n", request);
 
-		char * headerinfo[6];
+		char * headerinfo[4];
 
 		char tmp[strlen(request) + 1];
 		strcpy(tmp, request);
 
-		parse_packet(tmp, headerinfo);
-		/*if(!parse_packet(tmp, headerinfo))
-		{
-			//TODO: Failure
-			printf("Could not be properly parsed.");
-			continue;
-		}*/
+		parse_packet_header(tmp, headerinfo);
+
 		state = typeToState(headerinfo[1]);
 
 		printf("state = %d\n", state);
 		int seqn = atoi(headerinfo[2]);
-		int ackn = atoi(headerinfo[3]);
-		int length = atoi(headerinfo[4]);
-		int size = atoi(headerinfo[5]);
+		int length = atoi(headerinfo[3]);
 
 		int window = getWindowSize();
 

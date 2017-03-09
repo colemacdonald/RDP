@@ -146,13 +146,16 @@ void parse_request(char * request_string, char ** buffer)
 	}
 }
 
-int parse_packet(char * recv, char ** buffer)
+int parse_packet_header(char * recv, char ** buffer)
 {
+	// recv = "CSC361 _type _num1 _num2"
+	// from sender: _num1 = seq_num, _num2 = length
+	// from recvr: _num1 = ack_num, _num2 = window size
 	const char s[2] = " ";
 	char * token = strtok(recv, s);
 
 	int i = 0;
-	while(token != NULL && i < 5)
+	while(token != NULL && i < 4)//(sizeof buffer) / (sizeof char*))
 	{
 		buffer[i] = token;
 		token = strtok(NULL, s);
