@@ -181,6 +181,7 @@ int main (int argc, char ** argv)
 			continue;
 		}
 
+		printf("end parse\n");
 		state = typeToState(headerinfo[1]);
 
 		printf("state = %d\n", state);
