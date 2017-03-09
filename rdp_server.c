@@ -131,7 +131,7 @@ void generateHeaderDAT(char * headerbuffer, int seqn, int length)
 	char header[1000] = "CSC361 DAT \0"; //_seq _ackno _length _size\r\n\r\n"
 
 	char seqstr[4];
-	sprintf(seqstr, " %d ", seqn);
+	sprintf(seqstr, "%d ", seqn);
 	strcat(header, seqstr);
 
 	char lenstr[10];
