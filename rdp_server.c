@@ -161,9 +161,13 @@ int sendSYN()
 	printf("%s\n", header);
 
 	int s = sendto(sock, header, strlen(header), 0, (struct sockaddr*)&sa_r, sizeof sa_r);
+	if(s < 0)
+	{
+		//TODO: Failure
+		printf("Could not send SYN, errno = %d\n", errno);
+		return FALSE;
+	}
 
-	printf("sendto return: %d\n", s);
-	printf("%d\n",errno);
 	syn_packs_sent += 1;
 	return TRUE;
 }
@@ -237,96 +241,69 @@ int main( int argc, char ** argv )
 
 	while (1)
 	{
-		//ensure stdin does not unneccesarily trigger select
-		fflush(STDIN_FILENO);
+		ssize_t recsize;
+		socklen_t fromlen = sizeof(sa_s);
+		char request[BUFFER_SIZE];
 
-		//prepare the fd_set
-		FD_ZERO( &read_fds );
-
-		//time out counter -> use select timeout?
-		//FD_SET( STDIN_FILENO, &read_fds );
-		FD_SET( sock, &read_fds );
-
-		//replace (i think) final NULL with timeout value;
-		select_result = select( sock + 1, &read_fds, NULL, NULL, NULL /*timeout*/);
-
-		switch( select_result )
+		recsize = recvfrom(sock, (void*) request, sizeof request, 0, (struct sockaddr*)&sa_s, &fromlen);
+		if(recsize == -1)
 		{
-			case -1:
-				//error
-				printf("Error in select (-1). Continuing.\n");
-				break;
-			case 0:
+			//printf("Error occured.\n");
+			continue;
+		}
 
-				printf("Error in select (0). Continuing.\n");
+		printf("%s\n", request);
+
+		char * headerinfo[6];
+		//ex request: "CSC361 _type _seq _ackno _length _size\r\n\r\n"
+		if(!parse_packet(request, headerinfo))
+		{
+			//TODO: Failure
+			printf("Could not be properly parsed.");
+			continue;
+		}
+		int state = typeToState(headerinfo[1]);
+		int seqn = atoi(headerinfo[2]);
+		int ackn = atoi(headerinfo[3]);
+		int length = atoi(headerinfo[4]);
+		int size = atoi(headerinfo[5]);
+
+		switch(state)
+		{
+			//DAT
+			case 1:
+				//something wrong
 				break;
+
+			//ACK
+			case 2:
+				//send data packet
+				sendDataPacket(seqn, length);
+				break;
+
+			//SYN
+			case 3:
+			//something wrong
+				//send ack
+				//sendAckPacket(seqn, length);
+				break;
+
+			//FIN
+			case 4:
+				//something wrong
+				break;
+
+			//RST
+			case 5:
+				//toss all data
+				//clear buffers
+				//empty file
+				//ack
+				break;
+
+			//unknown state
 			default:
-				//select returned properly
-				if(FD_ISSET(sock, &read_fds))
-				{
-					ssize_t recsize;
-					socklen_t fromlen = sizeof(sa_s);
-					char request[BUFFER_SIZE];
-
-					recsize = recvfrom(sock, (void*) request, sizeof request, 0, (struct sockaddr*)&sa_s, &fromlen);
-					if(recsize == -1)
-					{
-						//printf("Error occured.\n");
-						continue;
-					}
-
-					char * headerinfo[6];
-					//ex request: "CSC361 _type _seq _ackno _length _size\r\n\r\n"
-					if(!parse_packet(request, headerinfo))
-					{
-						//TODO: Failure
-						printf("Could not be properly parsed.");
-						continue;
-					}
-					int state = typeToState(headerinfo[1]);
-					int seqn = atoi(headerinfo[2]);
-					int ackn = atoi(headerinfo[3]);
-					int length = atoi(headerinfo[4]);
-					int size = atoi(headerinfo[5]);
-
-					switch(state)
-					{
-						//DAT
-						case 1:
-							//something wrong
-							break;
-
-						//ACK
-						case 2:
-							//send data packet
-							sendDataPacket(seqn, length);
-							break;
-
-						//SYN
-						case 3:
-						//something wrong
-							//send ack
-							//sendAckPacket(seqn, length);
-							break;
-
-						//FIN
-						case 4:
-							//something wrong
-							break;
-
-						//RST
-						case 5:
-							//toss all data
-							//clear buffers
-							//empty file
-							//ack
-							break;
-
-						//unknown state
-						default:
-							break;
-					}//end switch
-				}//end if
+				break;
 		}//end switch
 	}//end while
 
