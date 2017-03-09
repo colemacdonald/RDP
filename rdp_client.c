@@ -168,7 +168,7 @@ int main (int argc, char ** argv)
 
 		//replace (i think) final NULL with timeout value;
 		select_result = select( sock + 1, &read_fds, NULL, NULL, NULL /*timeout*/);
-
+		printf("select = %d\n", select_result);
 		switch( select_result )
 		{
 			case -1:
