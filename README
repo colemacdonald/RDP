@@ -28,17 +28,27 @@ The RDP Header appears as follows:
 2. How do you design and implement the connection management using SYN, FIN and RST packets? How to choose the initial sequence number?
 
 The designed connection establishment is implemented as a two-way handshake and works as follows:
-	1. Server sends a SYN packet to the reciever
+	1. Sender sends a SYN packet to the reciever
 	2. Reciever responds with an ACK packet
-	3. Server may now begin sending data
+	3. Sender may now begin sending data
 
-The designed connection finish ... :
+The designed connection finish is also implemented as a two-way handshake and works as follows:
+	1. Sender sends FIN packet
+	2. Client responds with an ACK packet
+	3. Client closes socket and returns
+	4. Sender closes socket and returns
 
 
 	The initial sequence number is chosen randomly as to avoid collisions with any services that may have previously used the same port and ip.
 
 
 3. How do you design and implement the flow control using window size? How to choose the initial window size and adjust the size? How to read and write the file and how to manage the buffer at the sender and receiver side, respectively?
+	
+	As described in the header section above, every ACK packet sent by the receiver will include the window size. This number represents the most amount of data that the receiver can handle at this time. The sender will look at that number, and send the most amount of packets (packets have a max size) it can without overwhelming the receiver.
+
+	The initial window size will be the size of the receiver buffer and will be reduced when the buffer is filled. When the buffer is full, it will be appended to the file in which the data is being stored - after which the buffer can be emptied and the window size reset.
+
+	On the sender side, ...
 
 4. How do you design and implement the error detection, notification and recovery? How to use timer? How many timers do you use? How to respond to the events at the sender and receiver side, respectively? How to ensure reliable data transfer?
 

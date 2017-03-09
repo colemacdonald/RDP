@@ -165,7 +165,8 @@ int main (int argc, char ** argv)
 
 	printf("rdpc is running on UDP port %s\n", port_r);
 
-	while (1)
+	int listening = TRUE;
+	while (listening)
 	{	
 		ssize_t recsize;
 		socklen_t fromlen = sizeof(sa);
@@ -217,6 +218,7 @@ int main (int argc, char ** argv)
 			case 4:
 				//ack
 				sendAckPacket(seqn, length, 0);
+				listening = FALSE;
 				break;
 			//RST
 			case 5:
