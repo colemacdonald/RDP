@@ -135,7 +135,7 @@ void generateHeaderDAT(char * headerbuffer, int seqn, int length)
 	strcat(header, seqstr);
 
 	char lenstr[10];
-	sprintf(lenstr, "%d", length);
+	sprintf(lenstr, "%d\r\n\r\n", length);
 	strcat(header, lenstr);
 
 
