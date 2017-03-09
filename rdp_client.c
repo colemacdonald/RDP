@@ -173,8 +173,11 @@ int main (int argc, char ** argv)
 
 		char * headerinfo[6];
 
+		char tmp[strlen(request) + 1];
+		strcpy(tmp, request);
+
 		printf("parse\n");
-		if(!parse_packet(request, headerinfo))
+		if(!parse_packet(tmp, headerinfo))
 		{
 			//TODO: Failure
 			printf("Could not be properly parsed.");
