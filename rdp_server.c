@@ -26,13 +26,30 @@
 //									GLOBAL VARIABLES
 ////////////////////////////////////////////////////////////////////////////////////////////
 
-int sock;
-char * ip_s;
-char * port_s;
-char * ip_r;
-char * port_r;
-char * f_to_send;
-struct sockaddr_in sa;
+int 	sock;
+char * 	ip_s;
+char * 	port_s;
+char * 	ip_r;
+char * 	port_r;
+char * 	f_to_send;
+struct 	sockaddr_in sa;
+
+int 	total_data_bytes_sent 	= 0;
+int 	unique_data_bytes_sent 	= 0;
+int 	total_data_packs_sent	= 0;
+int 	unique_data_packs_sent	= 0;
+int 	syn_packs_sent			= 0;
+int 	fin_packs_sent			= 0;
+int 	rst_packs_sent			= 0;
+int 	ack_packs_recv			= 0;
+int 	rst_packs_recv			= 0;
+
+int 	start_time				= 0;
+
+int 	seq0;
+int 	last_seq;
+int 	last_length;
+
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////
@@ -51,8 +68,6 @@ int prepareSocket()
 		return FALSE;
 	}
 
-	//printf("sock = %d\n", sock);
-
 	//http://stackoverflow.com/questions/24194961/how-do-i-use-setsockoptso-reuseaddr
 	setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &(int){ 1 }, sizeof(int));
 
@@ -60,19 +75,28 @@ int prepareSocket()
 	ssize_t recsize;
 	socklen_t fromlen;
 
+	//TODO: Use reciever port and ip, connect instead of bind
+
 	memset(&sa, 0, sizeof sa);
 	sa.sin_family = AF_INET;
-	sa.sin_addr.s_addr = htonl(INADDR_ANY);
+	sa.sin_addr.s_addr = htonl(ip_r);
 	sa.sin_port = htons( atoi( port_s ) ); //convert to int
 	fromlen = sizeof(sa);
 	//end of copy
 
-	if(bind(sock, (struct sockaddr *) &sa, sizeof sa) != 0)
+	if(connect(sock, (struct sockaddr *) &sa, sizeof sa) != 0)
+	{
+		printf("Could not connect to receiver socket\n");
+		close(sock);
+		return FALSE;
+	}
+
+	/*if(bind(sock, (struct sockaddr *) &sa, sizeof sa) != 0)
 	{
 		printf("socket could not be bound\n");
 		close(sock);
 		return FALSE;
-	}
+	}*/
 	return TRUE;
 }
 
@@ -81,28 +105,82 @@ int generateRandomSequenceNumber()
 	int num;
 	srand(time(NULL));
 	num = rand();
-	num = num % 1000;
+	num = num % 1000000;
 	return num;
 }
 
-void generateHeader(char * headerbuffer)
+void generateHeaderSYN(char * headerbuffer)
 {
 	char header[1000] = "CSC361 SYN \0"; //_seq _ackno _length _size\r\n\r\n"
-	int seq = generateRandomSequenceNumber();
+	int seqn = generateRandomSequenceNumber();
+	seq0 = seqn;
 	char seqstr[4];
-	sprintf(seqstr, "%d", seq);
+	sprintf(seqstr, "%d", seqn);
 	strcat(header, seqstr);
+
+	// no ackno, synlen = 1, no window
 	strcat(header, " -1 1 0\r\n\r\n\0");
 
 	strcpy(headerbuffer, header);
 }
 
-int establishConnection()
+void generateHeaderDAT(char * headerbuffer, int seqn, int length)
+{
+	char header[1000] = "CSC361 DAT \0"; //_seq _ackno _length _size\r\n\r\n"
+
+	char seqstr[4];
+	sprintf(seqstr, "%d", seqn);
+	strcat(header, seqstr);
+
+	// no ackno
+	strcat(header, " -1 ");
+
+	char lenstr[10];
+	sprintf(lenstr, "%d", length);
+	strcat(header, lenstr)
+
+	// only one way, no window
+	strcat(header,  "0\r\n\r\n\0");
+
+	strcpy(headerbuffer, header);
+}
+
+// TODO: Implement
+int unique_packet()
+{
+	return TRUE;
+}
+
+// TODO: Implement
+int sendSYN()
 {
 	char header[1000];
-	generateHeader(header);
+	generateHeaderSYN(header);
 	printf("%s\n", header);
 
+	sendto(sock, header, strlen(header), 0, (struct sockaddr*)&sa, sizeof sa);
+
+	syn_packs_sent += 1;
+	return TRUE;
+}
+
+// TODO: Implement
+int sendDataPacket(int seqn, int length)
+{
+	char header[1000];
+	generateHeaderDAT(header, seqn, length);
+
+	//append data to header
+	//sendto(sock, header, strlen(header), 0, (struct sockaddr*)&sa, sizeof sa);
+	total_bytes_sent += length;
+
+	if(unique_packet())
+	{
+		unique_data_bytes_sent += length;
+		unique_data_packs_sent += 1;
+	}
+
+	total_data_packs_sent += 1;
 	return TRUE;
 }
 
@@ -129,7 +207,10 @@ int main( int argc, char ** argv )
 	port_r = argv[4];
 	f_to_send = argv[5];*/
 
+	ip_s = "192.168.1.100";
 	port_s = "8080";
+	ip_r = "10.10.1.100";
+	port_r = "8080";
 	f_to_send = "public/index.html";
 
 	if(!fileExists(f_to_send))
@@ -148,7 +229,7 @@ int main( int argc, char ** argv )
 	fd_set read_fds;
 
 	printf("rdp is running on UDP port %s\n", port_s);
-	establishConnection();
+	sendSYN();
 
 	while (1)
 	{
@@ -177,6 +258,74 @@ int main( int argc, char ** argv )
 				break;
 			default:
 				//select returned properly
+				if(FD_ISSET(sock, &read_fds))
+				{
+					ssize_t recsize;
+					socklen_t fromlen = sizeof(sa);
+					char request[BUFFER_SIZE];
+
+					recsize = recvfrom(sock, (void*) request, sizeof request, 0, (struct sockaddr*)&sa, &fromlen);
+					if(recsize == -1)
+					{
+						//printf("Error occured.\n");
+						continue;
+					}
+
+					char * headerinfo[6];
+					//ex request: "CSC361 _type _seq _ackno _length _size\r\n\r\n"
+					if(!parse_packet(request, headerinfo))
+					{
+						//TODO: Failure
+						printf("Could not be properly parsed.");
+						continue;
+					}
+					state = typeToState(headerinfo[1]);
+					int seqn = atoi(headerinfo[2]);
+					int ackn = atoi(headerinfo[3]);
+					int length = atoi(headerinfo[4]);
+					int size = atoi(headerinfo[5]);
+
+					switch(state)
+					{
+						//DAT
+						case 1:
+							//something wrong
+							break;
+
+						//ACK
+						case 2:
+							//send data packet
+							sendDataPacket(seqn, length);
+							break;
+
+						//SYN
+						case 3:
+						//something wrong
+							//send ack
+							//sendAckPacket(seqn, length);
+							break;
+
+						//FIN
+						case 4:
+							//something wrong
+							break;
+
+						//RST
+						case 5:
+							//toss all data
+							//clear buffers
+							//empty file
+							//ack
+							break;
+
+						//unknown state
+						default:
+					}
+				}
+
+
+				break;
+		}//end switch
 				break;
 		}//end switch
 	}//end while

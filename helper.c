@@ -199,3 +199,29 @@ void printLogString(char * request, char * response, struct sockaddr_in sa, char
 
 	printf("%s %s:%hu %s; %s; %s\n",timestring, inet_ntoa(sa.sin_addr), sa.sin_port, requestTrimmed, response, file);
 }
+
+int typeToState(char * recv)
+{
+	/**
+	* recv ex: "CSC361 _type _seq _ackno _length _size\r\n\r\n"
+	*/
+	if(strcmp(recv, TYPES.data) == 0)
+	{
+		return 1;
+	} else if(strcmp(recv, TYPES.acknowledgement) == 0)
+	{
+		return 2;
+	} else if(strcmp(recv, TYPES.sync) == 0)
+	{
+		return 3;
+	} else if(strcmp(recv, TYPES.finish) == 0)
+	{
+		return 4;
+	} else if (strcmp(recv, TYPES.reset) == 0)
+	{
+		return 5;
+	} else 
+	{
+		return 0;
+	}
+}

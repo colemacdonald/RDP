@@ -42,4 +42,6 @@ int directoryExists(char * directory);
 
 void printLogString(char * request, char * response, struct sockaddr_in sa, char * file);
 
+int typeToState(char * recv);
+
 #endif

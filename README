@@ -5,8 +5,51 @@ Reliable Datagram Protocol
 V00802949
 B03
 
+DESIGN:
 
 P2A: project design + IMPLEMENTATION of connection management (handshake)
+
+
+Dr. Pan Q's:
+1. How do you design and implement your RDP header and header fields? Do you use any additional header fields?
+
+The RDP Header appears as follows:
+	"CSC361 _type _seq _ackno _length _size\r\n\r\n"
+
+	The type field will be one of the following strings and corresponds to the type of packet:
+		1. SYN
+		2. ACK
+		3. DAT
+		4. RST
+		5. FIN
+
+	Only one of _seq and _ackno is relavent (_seq for SYN, DAT, FIN; _ackno for ACK, RST), the other will come in as -1 to signify that it need not be taken into account.
+
+	The _length field corresponds to the size of the packet (minus the header), for SYN packets, the length will be 1, for DAT packets, the length will be the size of the payload, and for ACK packets the length will be 0.
+
+	Since RDP is a unidirectional protocol, the sender never has to worry about a reciever buffer and thus the _size (which corresponds to the window size) will always be 0 for packets from the sender and the window_size value for packets from the reciever.
+
+
+
+2. How do you design and implement the connection management using SYN, FIN and RST packets? How to choose the initial sequence number?
+
+The designed connection establishment is implemented as a two-way handshake and works as follows:
+	1. Server sends a SYN packet to the reciever
+	2. Reciever responds with an ACK packet
+	3. Server may now begin sending data
+
+The designed connection finish
+
+	The initial sequence number is chosen randomly as to avoid collisions with any services that may have previously used the same port and ip.
+
+
+3. How do you design and implement the flow control using window size? How to choose the initial window size and adjust the size? How to read and write the file and how to manage the buffer at the sender and receiver side, respectively?
+
+4. How do you design and implement the error detection, notification and recovery? How to use timer? How many timers do you use? How to respond to the events at the sender and receiver side, respectively? How to ensure reliable data transfer?
+
+5. Any additional design and implementation considerations you want to get feedback from your lab instructor?
+
+If ever, 
 
 #talk about project design
 

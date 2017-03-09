@@ -43,6 +43,7 @@ int 	rst_packs_sent 		= 0;
 int 	duration 			= 0;
 
 int 	state				= 0;
+int 	last_ack			= 0;
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 //									HELPER FUNCTIONS
@@ -95,38 +96,36 @@ int finishConnection()
 	return TRUE;
 }
 
-int typeToState(char * recv)
+void generateAckHeader(char * headerbuffer, int ackn)
 {
-	/**
-	* recv ex: "CSC361 _type _seq _ackno _length _size\r\n\r\n"
-	*/
-	if(strcmp(recv, TYPES.data) == 0)
-	{
-		return 1;
-	} else if(strcmp(recv, TYPES.acknowledgement) == 0)
-	{
-		return 2;
-	} else if(strcmp(recv, TYPES.sync) == 0)
-	{
-		return 3;
-	} else if(strcmp(recv, TYPES.finish) == 0)
-	{
-		return 4;
-	} else if (strcmp(recv, TYPES.reset) == 0)
-	{
-		return 5;
-	} else 
-	{
-		return 0;
-	}
+	char header[1000] = "CSC361 ACK -1 \0"; //CSC361 _type _seq _ackno _length _size\r\n\r\n"
 
+	char ackstr[4];
+	sprintf(ackstr, "%d", seq);
+	strcat(header, ackstr);
+	strcat(header, " 1 0\r\n\r\n\0");
+
+	strcpy(headerbuffer, header);
 }
 
-int sendAckPacket()
+int sendAckPacket(int seqn, int length)
 {
+	char * header[1000];
+	int ackn = seqn + length;
 
+	generateAckHeader(header, ackn);
+
+	sendto(sock, header, strlen(header), 0, (struct sockaddr*)&sa, sizeof sa);
+	ack_packs_sent += 1;
+	last_ack = ackn;
 
 	return 1;
+}
+
+int getWindowSize()
+{
+	//TODO: what is size of header? Have to take it into account
+	return 1024;
 }
 ////////////////////////////////////////////////////////////////////////////////////////////
 //										MAIN
@@ -195,6 +194,8 @@ int main (int argc, char ** argv)
 						continue;
 					}
 
+
+					printf("%s\n", request);
 					char * headerinfo[6];
 					//ex request: "CSC361 _type _seq _ackno _length _size\r\n\r\n"
 					if(!parse_packet(request, headerinfo))
@@ -209,19 +210,37 @@ int main (int argc, char ** argv)
 					int length = atoi(headerinfo[4]);
 					int size = atoi(headerinfo[5]);
 
+					int window = getWindowSize();
+
 					switch(state)
 					{
 						//DAT
 						case 1:
+							//read in
+							//ack
+							sendAckPacket(seqn, length, window);
+							break;
 						//ACK
 						case 2:
+							//something wrong
+							break;
 						//SYN
 						case 3:
+							//send ack
+							sendAckPacket(seqn, length, window);
+							break;
 						//FIN
 						case 4:
+							//ack
+							sendAckPacket(seqn, length, 0);
+							break;
 						//RST
 						case 5:
-
+							//toss all data
+							//clear buffers
+							//empty file
+							//ack
+							break;
 						//unknown state
 						default:
 					}
