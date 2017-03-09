@@ -158,8 +158,9 @@ int sendSYN()
 	generateHeaderSYN(header);
 	printf("%s\n", header);
 
-	sendto(sock, header, strlen(header), 0, (struct sockaddr*)&sa, sizeof sa);
+	ssize_t s = sendto(sock, header, strlen(header), 0, (struct sockaddr*)&sa, sizeof sa);
 
+	printf("sendto return: %d\n", s);
 	syn_packs_sent += 1;
 	return TRUE;
 }
