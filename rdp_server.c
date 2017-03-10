@@ -73,12 +73,9 @@ int readFileToMemory(char * filename)
 	file_size = ftell(fp);
 	fseek(fp, 0L, SEEK_SET);
 
-	printf("File size: %d", file_size);
-
 	char filebuffer[file_size];
 
 	//read file
-	
 	bytes_read = fread(filebuffer, sizeof(char), file_size, fp);
 	fclose(fp);
 	file_data = filebuffer;
@@ -306,6 +303,8 @@ int main( int argc, char ** argv )
 		close(sock);
 		return EXIT_FAILURE;
 	}
+
+	printf("File read:\n%s\n", file_data);
 
 	printf("rdps is running on UDP %s:%s\n", ip_s, port_s);
 
