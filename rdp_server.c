@@ -73,6 +73,8 @@ int readFileToMemory(char * filename)
 	file_size = ftell(fp);
 	fseek(fp, 0L, SEEK_SET);
 
+	printf("File size: %d", file_size);
+
 	char filebuffer[file_size];
 
 	//read file
