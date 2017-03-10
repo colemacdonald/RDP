@@ -77,6 +77,8 @@ int readFileToMemory(char * filename)
 
 	//read file
 	bytes_read = fread(filebuffer, sizeof(char), file_size, fp);
+
+	printf("filebuffer:\n%s\n", filebuffer);
 	fclose(fp);
 	file_data = filebuffer;
 
@@ -292,10 +294,6 @@ int main( int argc, char ** argv )
 	{
 		return EXIT_FAILURE;
 	}
-
-	//prep fdset
-	int select_result;
-	fd_set read_fds;
 
 	if(!readFileToMemory(f_to_send))
 	{
