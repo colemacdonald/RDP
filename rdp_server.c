@@ -79,7 +79,7 @@ int readFileToMemory(char * filename)
 	
 	bytes_read = fread(filebuffer, sizeof(char), file_size, fp);
 	fclose(fp);
-	file_data = filebuffer;
+	//file_data = filebuffer;
 
 	return TRUE;
 }
