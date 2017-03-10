@@ -203,7 +203,7 @@ int main (int argc, char ** argv)
 				//read in
 				parse_packet_payload(request, recvbuffer);
 				//ack
-				//sendAckPacket(seqn, length, window);
+				sendAckPacket(seqn, length, window);
 				break;
 			//ACK
 			case 2:
