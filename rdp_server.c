@@ -52,7 +52,7 @@ int 	last_seq;
 int 	last_length;
 
 char *		file_data;
-long int 	file_size;
+int 	file_size;
 
 
 
