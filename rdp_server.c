@@ -65,7 +65,7 @@ int readFileToMemory(char * filename)
 	if(!fileExists(filename))
 		return FALSE;
 
-	FILE * fp;
+	FILE * fp = fopen(filename, "r");
 	long int bytes_read;
 
 	//determine file length
@@ -81,7 +81,7 @@ int readFileToMemory(char * filename)
 	
 	bytes_read = fread(filebuffer, sizeof(char), file_size, fp);
 	fclose(fp);
-	//file_data = filebuffer;
+	file_data = filebuffer;
 
 	return TRUE;
 }
