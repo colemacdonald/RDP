@@ -366,7 +366,10 @@ int main( int argc, char ** argv )
 				if(!fileTranserComplete(ackn))
 					sendDataPacket(ackn, size);//seqn, length);
 				else if(ackn != final_ack_expected)
+				{
 					sendFIN(ackn);
+					final_ack_expected = ackn + 1;
+				}
 				else
 					finished = TRUE;
 				break;
