@@ -177,6 +177,7 @@ int unique_packet()
 
 int sendPacket(char * data)
 {
+	printf("Sending:\n%s\n", data);
 	int s = sendto(sock, data, strlen(data) + 1, 0, (struct sockaddr*)&sa_r, sizeof sa_r);
 	if(s < 0)
 	{
