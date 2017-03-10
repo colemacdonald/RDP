@@ -260,6 +260,13 @@ int finishConnection()
 	return TRUE;
 }
 
+int fileTranserComplete(int ack)
+{
+	if(ack > seq0 + 2)
+		return TRUE;
+	return FALSE;
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////
 //										MAIN
 ////////////////////////////////////////////////////////////////////////////////////////////
@@ -295,14 +302,14 @@ int main( int argc, char ** argv )
 		return EXIT_FAILURE;
 	}
 
-	if(!readFileToMemory(f_to_send))
+	/*if(!readFileToMemory(f_to_send))
 	{
 		printf("Specified file could not be read. Given: %s\n", f_to_send);
 		close(sock);
 		return EXIT_FAILURE;
 	}
 
-	printf("File read:\n%s\n", file_data);
+	printf("File read:\n%s\n", file_data);*/
 
 	printf("rdps is running on UDP %s:%s\n", ip_s, port_s);
 
@@ -353,9 +360,11 @@ int main( int argc, char ** argv )
 			//ACK
 			case 2:
 				//send data packet
-				sendDataPacket(ackn, size);//seqn, length);
+				if(!fileTranserComplete(ackn))
+					sendDataPacket(ackn, size);//seqn, length);
+				else
+					sendFIN();
 				break;
-
 			//SYN
 			case 3:
 			//something wrong
