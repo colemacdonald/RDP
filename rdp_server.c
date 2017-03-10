@@ -363,7 +363,7 @@ int main( int argc, char ** argv )
 				if(!fileTranserComplete(ackn))
 					sendDataPacket(ackn, size);//seqn, length);
 				else
-					sendFIN();
+					sendFIN(ackn);
 				break;
 			//SYN
 			case 3:
