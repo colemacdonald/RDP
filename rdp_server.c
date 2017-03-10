@@ -51,8 +51,9 @@ int 	seq0;
 int 	last_seq;
 int 	last_length;
 
-char *		file_data;
+char *	file_data;
 int 	file_size;
+int 	final_ack_expected		= 0;
 
 
 
@@ -315,7 +316,9 @@ int main( int argc, char ** argv )
 
 	sendSYN();
 
-	while (1)
+	int finished = FALSE;
+
+	while (!finished)
 	{
 		ssize_t recsize;
 		socklen_t fromlen = sizeof(sa_s);
@@ -362,8 +365,10 @@ int main( int argc, char ** argv )
 				//send data packet
 				if(!fileTranserComplete(ackn))
 					sendDataPacket(ackn, size);//seqn, length);
-				else
+				else if(ackn != final_ack_expected)
 					sendFIN(ackn);
+				else
+					finished = TRUE;
 				break;
 			//SYN
 			case 3:
