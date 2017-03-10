@@ -51,12 +51,38 @@ int 	seq0;
 int 	last_seq;
 int 	last_length;
 
+char *		file_data;
+long int 	file_size;
+
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 //									HELPER FUNCTIONS
 ////////////////////////////////////////////////////////////////////////////////////////////
 
+int readFileToMemory(char * filename)
+{
+	if(!fileExists(filename))
+		return FALSE;
+
+	FILE * fp;
+	long int bytes_read;
+
+	//determine file length
+	fseek(fp, 0L, SEEK_END);
+	file_size = ftell(fp);
+	fseek(fp, 0L, SEEK_SET);
+
+	char filebuffer[file_size];
+
+	//read file
+	
+	bytes_read = fread(filebuffer, sizeof(char), file_size, fp);
+	fclose(fp);
+	file_data = filebuffer;
+
+	return TRUE;
+}
 
 int prepareSocket()
 {
@@ -93,7 +119,6 @@ int prepareSocket()
 	}
 
 	// prep sa_r
-
 	memset(&sa_r, 0, sizeof sa_r);
 	sa_r.sin_family = AF_INET;
 	sa_r.sin_addr.s_addr = inet_addr(ip_r);
@@ -145,6 +170,16 @@ void generateHeaderDAT(char * headerbuffer, int seqn, int length)
 // TODO: Implement
 int unique_packet()
 {
+	return TRUE;
+}
+
+int sendPacket(char * data)
+{
+	int s = sendto(sock, data, strlen(data) + 1, 0, (struct sockaddr*)&sa_r, sizeof sa_r);
+	if(s < 0)
+	{
+		return FALSE;
+	}
 	return TRUE;
 }
 
@@ -206,16 +241,6 @@ void generateHeaderFIN(int seqn, char * headerbuffer)
 	strcpy(headerbuffer, header);
 }
 
-int sendPacket(char * data)
-{
-	int s = sendto(sock, data, strlen(data) + 1, 0, (struct sockaddr*)&sa_r, sizeof sa_r);
-	if(s < 0)
-	{
-		return FALSE;
-	}
-	return TRUE;
-}
-
 int sendFIN(int seqn)
 {
 	char header[1000];
@@ -273,7 +298,15 @@ int main( int argc, char ** argv )
 	int select_result;
 	fd_set read_fds;
 
+	if(!readFileToMemory(f_to_send))
+	{
+		printf("Specified file could not be read. Given: %s\n", f_to_send);
+		close(sock);
+		return EXIT_FAILURE;
+	}
+
 	printf("rdps is running on UDP %s:%s\n", ip_s, port_s);
+
 	sendSYN();
 
 	while (1)
@@ -289,7 +322,7 @@ int main( int argc, char ** argv )
 			continue;
 		}
 
-		printf("%s\n", request);
+		printf("recvd:\n%s\n", request);
 
 
 		// TODO: shorten header -> no point in sending seqn or length from recvr

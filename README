@@ -24,7 +24,6 @@ The RDP Header appears as follows:
 	For packets from the sender, num1 will correspond to the sequence number and num2 will correspond to the payload length. On the other hand, for packets from the sender, num1 and num2 will correspond to the acknowledgement number and the window size respectively. The header is designed this way as to be as small as possible.
 
 
-
 2. How do you design and implement the connection management using SYN, FIN and RST packets? How to choose the initial sequence number?
 
 The designed connection establishment is implemented as a two-way handshake and works as follows:
@@ -52,11 +51,21 @@ The designed connection finish is also implemented as a two-way handshake and wo
 
 4. How do you design and implement the error detection, notification and recovery? How to use timer? How many timers do you use? How to respond to the events at the sender and receiver side, respectively? How to ensure reliable data transfer?
 
+Errors will be detected through timeouts, sequence numbers, acknowledgement numbers, and comparing the payload length to the specified length in the packet header. 
+
+	Timout: If a timeout occurs, the packet that 'timedout' will be resent and the timer restarted (with an increased timeout value). Once the packet is successfully transfered the timeout value will be reset to the original.
+	I plan on using 1 timer, keeping track of the most recent 'group' of packets that have been sent out (since the amount of packets being sent at a time will vary based on the advertised window size).
+
+	Sequence Numbers: If the sequence number of the packet received by the receiver is not the one it is expecting, it will drop the packet and resend the previous acknolodgement message sent - prompting the sender to resend the correct packet.
+
+	Acknowledgement Numbers: If the acknowledgment packet received by the sender is acknowledging a packet that the sender has not sent yet, the sender will send a RST packet (as something has clearly gone catastrophically wrong), and, after receiving acknowledgment, will attempt to restart the connection with a SYN packet.
+
+	Length of Payload: If the length of the payload does not match the length specified in the RDP header, then, similarly to the solution for incorrect sequence numbers, the receiver will resend the last ACK packet, prompting the sender to resend the DAT packet.
+
+Using all of the above techniques for error detection and recovery will result in a reliable data transfer.
+
 5. Any additional design and implementation considerations you want to get feedback from your lab instructor?
 
-If ever, 
-
-#talk about project design
 
  ~ Cole Macdonald
  
