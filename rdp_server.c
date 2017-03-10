@@ -249,6 +249,8 @@ int sendFIN(int seqn)
 	char header[1000];
 	generateHeaderFIN(seqn, header);
 
+	final_ack_expected = seqn + 1;
+
 	if(!sendPacket(header))
 	{
 		printf("Could not send FIN, errno = %d\n", errno);
@@ -367,10 +369,7 @@ int main( int argc, char ** argv )
 				if(!fileTranserComplete(ackn))
 					sendDataPacket(ackn, size);//seqn, length);
 				else if(ackn != final_ack_expected)
-				{
 					sendFIN(ackn);
-					final_ack_expected = ackn + 1;
-				}
 				else
 					finished = TRUE;
 				break;
