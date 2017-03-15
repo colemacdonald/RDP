@@ -381,7 +381,10 @@ int main( int argc, char ** argv )
 		else if(state == states.SEND_DATA)
 		{
 			if(!fileTranserComplete(ackn))
+			{
 				sendDataPacket(ackn, size);//seqn, length);
+				state = state.LISTENING;
+			}
 			else
 				state = states.FINISH;
 		}
