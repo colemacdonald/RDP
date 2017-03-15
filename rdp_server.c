@@ -386,6 +386,7 @@ int main( int argc, char ** argv )
 		}
 		else if(state == states.FINISH)
 		{
+			printf("State fin\n");
 			if(ackn != final_ack_expected)
 				sendFIN(ackn);
 			else
