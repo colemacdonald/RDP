@@ -367,9 +367,11 @@ int main( int argc, char ** argv )
 
 			parse_packet_header(tmp, headerinfo);
 
-			int type = typeStrToInt(headerinfo[1]);
-			int ackn = atoi(headerinfo[2]);
-			int size = atoi(headerinfo[3]);
+			type = typeStrToInt(headerinfo[1]);
+			ackn = atoi(headerinfo[2]);
+			size = atoi(headerinfo[3]);
+
+			state = states.SEND_DATA;
 
 			//TODO: do something else
 		}
