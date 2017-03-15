@@ -392,7 +392,10 @@ int main( int argc, char ** argv )
 		{
 			printf("State fin\n");
 			if(ackn != final_ack_expected)
+			{
+				state = states.LISTENING;
 				sendFIN(ackn);
+			}
 			else
 				finished = TRUE;
 		}
