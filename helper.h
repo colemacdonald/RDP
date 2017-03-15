@@ -11,6 +11,14 @@ typedef struct {
 	char * reset;
 } Types;
 
+typedef struct {
+	int DAT;
+	int ACK;
+	int SYN;
+	int FIN;
+	int RST;
+} IntTypes;
+
 typedef struct states {
 	int LISTENING;
 	int UNCONNECTED;
@@ -29,6 +37,7 @@ typedef struct states {
 
 
 static const Types TYPES = {"DAT", "ACK", "SYN", "FIN", "RST"};
+static const IntTypes iTypes = {0, 1, 2, 3, 4};
 static const States states = {0, 1, 2, 3, 4, 5, 6, 7};
 
 void getTimeString(char * buffer);

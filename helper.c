@@ -223,21 +223,21 @@ int typeStrToInt(char * recv)
 	*/
 	if(strcmp(recv, TYPES.data) == 0)
 	{
-		return 1;
+		return iTypes.DAT;
 	} else if(strcmp(recv, TYPES.acknowledgement) == 0)
 	{
-		return 2;
+		return iTypes.ACK;
 	} else if(strcmp(recv, TYPES.sync) == 0)
 	{
-		return 3;
+		return iTypes.SYN;
 	} else if(strcmp(recv, TYPES.finish) == 0)
 	{
-		return 4;
+		return iTypes.FIN;
 	} else if (strcmp(recv, TYPES.reset) == 0)
 	{
-		return 5;
+		return iTypes.RST;
 	} else 
 	{
-		return 0;
+		return -1;
 	}
 }

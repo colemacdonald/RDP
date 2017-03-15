@@ -46,6 +46,15 @@ int 	duration 			= 0;
 int 	type				= 0;
 int 	last_ack			= 0;
 
+
+int 		seqn;
+int 		length;
+int 		window;
+
+ssize_t 	recsize;
+socklen_t 	fromlen;
+char 		request[BUFFER_SIZE];
+
 ////////////////////////////////////////////////////////////////////////////////////////////
 //									HELPER FUNCTIONS
 ////////////////////////////////////////////////////////////////////////////////////////////
@@ -152,11 +161,6 @@ int main (int argc, char ** argv)
 	port_r 			= "8080"; 			//argv[2];
 	file_save_name 	= "save.txt";		//argv[3];
 
-	if(!prepareSocket())
-	{
-		return EXIT_FAILURE;
-	}
-
 	//prep fdset
 	int select_result;
 	fd_set read_fds;
@@ -165,38 +169,97 @@ int main (int argc, char ** argv)
 
 	printf("rdpc is running on UDP port %s\n", port_r);
 
+	int state = states.UNCONNECTED;
+
 	int listening = TRUE;
 	while (listening)
 	{	
-		ssize_t recsize;
-		socklen_t fromlen = sizeof(sa);
-		char request[BUFFER_SIZE];
-
-		recsize = recvfrom(sock, (void*) request, sizeof request, 0, (struct sockaddr*)&sa, &fromlen);
-		if(recsize < 0)
+		if(state == states.UNCONNECTED)
 		{
-			printf("Error occured.\n");
-			continue;
+			if(!prepareSocket())
+			{
+				return EXIT_FAILURE;
+			}
+			state = states.LISTENING;
 		}
+		else if(state == states.LISTENING)
+		{
+			//TODO: while 'listening' empty buffer, right now recvfrom is blocking
+			fromlen = sizeof(sa);
 
-		printf("recvd:\n%s\n", request);
+			recsize = recvfrom(sock, (void*) request, sizeof request, 0, (struct sockaddr*)&sa, &fromlen);
+			if(recsize < 0)
+			{
+				printf("Error occured.\n");
+				continue;
+			}
+			state = states.RECEIVED;
+		}
+		else if(state == states.RECEIVED)
+		{
+			printf("recvd:\n%s\n", request);
 
-		char * headerinfo[4];
+			char * headerinfo[4];
 
-		char tmp[strlen(request) + 1];
-		strcpy(tmp, request);
+			char tmp[strlen(request) + 1];
+			strcpy(tmp, request);
 
-		parse_packet_header(tmp, headerinfo);
+			parse_packet_header(tmp, headerinfo);
 
-		type = typeStrToInt(headerinfo[1]);
+			type = typeStrToInt(headerinfo[1]);
 
-		//printf("state = %d\n", state);
-		int seqn = atoi(headerinfo[2]);
-		int length = atoi(headerinfo[3]);
+			//printf("state = %d\n", state);
+			seqn = atoi(headerinfo[2]);
+			length = atoi(headerinfo[3]);
 
-		int window = getWindowSize();
+			window = getWindowSize();
 
-		switch(type)
+			if(type == iTypes.DAT)
+			{
+				//read in
+				parse_packet_payload(request, recvbuffer);
+
+				//TODO: Deal with data
+
+				//ack
+				sendAckPacket(seqn, length, window);
+			}
+			else if(type == iTypes.SYN)
+			{
+				//send ack
+				sendAckPacket(seqn, length, window);
+			}
+			else if(type == iTypes.FIN)
+			{
+				sendAckPacket(seqn, length, 0);
+				listening = FALSE;
+			}
+			else
+			{
+				//TODO: UNKNOWN
+			}
+			state = states.LISTENING;
+		}
+		else if(state == states.FINISH)
+		{
+			//might be uneeded
+		}
+		else if(state == states.RESET)
+		{
+			close(sock);
+			//TODO: clear buffer and empty file
+			state = states.UNCONNECTED;
+		}
+		else if(state == states.TIMEOUT)
+		{
+			//TODO: resend ack
+		}
+		else
+		{
+			//TODO: UNKNOWN
+		}// end if else...
+
+		/*switch(type)
 		{
 			//DAT
 			case 1:
@@ -230,7 +293,8 @@ int main (int argc, char ** argv)
 			//unknown state
 			default:
 				break;
-		}//end switch
+		}//end switch*/
+
 	}//end while
 
 	close(sock);

@@ -339,8 +339,8 @@ int main( int argc, char ** argv )
 		}
 		else if(state == states.LISTENING)
 		{
-			//what to do while listening??
-			//check recv buffer?
+			//TODO: what to do while listening??
+			//recvfrom is blocking
 
 			fromlen = sizeof(sa_s);
 
@@ -390,7 +390,6 @@ int main( int argc, char ** argv )
 		}
 		else if(state == states.FINISH)
 		{
-			printf("State fin\n");
 			if(ackn != final_ack_expected)
 			{
 				state = states.LISTENING;
@@ -402,11 +401,18 @@ int main( int argc, char ** argv )
 		else if(state == states.RESET)
 		{
 			close(sock);
+
+			//TODO: reset file information, close and reopen file?
+
 			state = states.UNCONNECTED;
 		}
 		else if(state == states.TIMEOUT)
 		{
 			//resend packets
+		}
+		else
+		{
+			//TODO: UNKNOWN
 		}
 	}//end while
 
