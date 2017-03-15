@@ -65,6 +65,8 @@ Errors will be detected through timeouts, sequence numbers, acknowledgement numb
 Using all of the above techniques for error detection and recovery will result in a reliable data transfer.
 
 5. Any additional design and implementation considerations you want to get feedback from your lab instructor?
+	
+	In your opinion, is keeping multiple timers make implementing this RDP simpler?
 
 
  ~ Cole Macdonald

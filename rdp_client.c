@@ -43,7 +43,7 @@ int 	ack_packs_sent 		= 0;
 int 	rst_packs_sent 		= 0;
 int 	duration 			= 0;
 
-int 	state				= 0;
+int 	type				= 0;
 int 	last_ack			= 0;
 
 ////////////////////////////////////////////////////////////////////////////////////////////
@@ -188,7 +188,7 @@ int main (int argc, char ** argv)
 
 		parse_packet_header(tmp, headerinfo);
 
-		state = typeToState(headerinfo[1]);
+		type = typeStrToInt(headerinfo[1]);
 
 		//printf("state = %d\n", state);
 		int seqn = atoi(headerinfo[2]);
@@ -196,7 +196,7 @@ int main (int argc, char ** argv)
 
 		int window = getWindowSize();
 
-		switch(state)
+		switch(type)
 		{
 			//DAT
 			case 1:

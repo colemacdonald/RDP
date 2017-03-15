@@ -216,7 +216,7 @@ void printLogString(char * request, char * response, struct sockaddr_in sa, char
 	printf("%s %s:%hu %s; %s; %s\n",timestring, inet_ntoa(sa.sin_addr), sa.sin_port, requestTrimmed, response, file);
 }
 
-int typeToState(char * recv)
+int typeStrToInt(char * recv)
 {
 	/**
 	* recv ex: "CSC361 _type _seq _ackno _length _size\r\n\r\n"

@@ -56,7 +56,13 @@ int 	file_size;
 int 	final_ack_expected		= 0;
 
 
+int 		type;
+int 		ackn;
+int 		size;
 
+ssize_t 	recsize;
+socklen_t 	fromlen;
+char 		request[BUFFER_SIZE];
 ////////////////////////////////////////////////////////////////////////////////////////////
 //									HELPER FUNCTIONS
 ////////////////////////////////////////////////////////////////////////////////////////////
@@ -301,11 +307,6 @@ int main( int argc, char ** argv )
 		return EXIT_FAILURE;
 	}
 
-	if(!prepareSocket())
-	{
-		return EXIT_FAILURE;
-	}
-
 	/*if(!readFileToMemory(f_to_send))
 	{
 		printf("Specified file could not be read. Given: %s\n", f_to_send);
@@ -317,89 +318,89 @@ int main( int argc, char ** argv )
 
 	printf("rdps is running on UDP %s:%s\n", ip_s, port_s);
 
-	sendSYN();
+	int state = states.UNCONNECTED;
 
 	int finished = FALSE;
 
 	while (!finished)
 	{
-		ssize_t recsize;
-		socklen_t fromlen = sizeof(sa_s);
-		char request[BUFFER_SIZE];
-
-		recsize = recvfrom(sock, (void*) request, sizeof request, 0, (struct sockaddr*)&sa_s, &fromlen);
-		if(recsize == -1)
+		if(state == states.UNCONNECTED)
 		{
-			//printf("Error occured.\n");
-			continue;
+			if(!prepareSocket())
+			{
+				return EXIT_FAILURE;
+			}
+
+			sendSYN();
+			state = states.LISTENING;
 		}
-
-		printf("recvd:\n%s\n", request);
-
-
-		// TODO: shorten header -> no point in sending seqn or length from recvr
-		char * headerinfo[4];
-		//ex request: "CSC361 _type _seq _ackno _length _size\r\n\r\n"
-		/*if(!parse_packet(request, headerinfo))
+		else if(state == states.LISTENING)
 		{
-			//TODO: Failure
-			printf("Could not be properly parsed.");
-			continue;
-		}*/
+			//what to do while listening??
+			//check recv buffer?
 
-		char tmp[strlen(request) + 1];
-		strcpy(tmp, request);
+			fromlen = sizeof(sa_s);
 
-		parse_packet_header(tmp, headerinfo);
-
-		int state = typeToState(headerinfo[1]);
-		int ackn = atoi(headerinfo[2]);
-		int size = atoi(headerinfo[3]);
-
-		switch(state)
+			recsize = recvfrom(sock, (void*) request, sizeof request, 0, (struct sockaddr*)&sa_s, &fromlen);
+			if(recsize == -1)
+			{
+				printf("Error occured.\n");
+				continue;
+			}
+			state = states.RECEIVED;
+		}
+		else if(states.RECEIVED)
 		{
-			//DAT
-			case 1:
-				//something wrong
-				break;
+			printf("recvd:\n%s\n", request);
 
-			//ACK
-			case 2:
-				//send data packet
-				if(!fileTranserComplete(ackn))
-					sendDataPacket(ackn, size);//seqn, length);
-				else if(ackn != final_ack_expected)
-					sendFIN(ackn);
-				else
-					finished = TRUE;
-				break;
-			//SYN
-			case 3:
-			//something wrong
-				//send ack
-				//sendAckPacket(seqn, length);
-				break;
+			char * headerinfo[4];
+			//ex request: "CSC361 _type _ackno _size\r\n\r\n"
+			/*if(!parse_packet(request, headerinfo))
+			{
+				//TODO: Failure
+				printf("Could not be properly parsed.");
+				continue;
+			}*/
 
-			//FIN
-			case 4:
-				//something wrong
-				break;
+			char tmp[strlen(request) + 1];
+			strcpy(tmp, request);
 
-			//RST
-			case 5:
-				//toss all data
-				//clear buffers
-				//empty file
-				//ack
-				break;
+			parse_packet_header(tmp, headerinfo);
 
-			//unknown state
-			default:
-				break;
-		}//end switch
+			int type = typeStrToInt(headerinfo[1]);
+			int ackn = atoi(headerinfo[2]);
+			int size = atoi(headerinfo[3]);
+
+			//TODO: do something else
+		}
+		else if(states.SEND_DATA)
+		{
+			if(!fileTranserComplete(ackn))
+				sendDataPacket(ackn, size);//seqn, length);
+			else
+				state = states.FINISH;
+		}
+		else if(states.FINISH)
+		{
+			if(ackn != final_ack_expected)
+				sendFIN(ackn);
+			else
+				finished = TRUE;
+		}
+		else if(states.RESET)
+		{
+			close(sock);
+			state = states.UNCONNECTED;
+		}
+		else if(states.TIMEOUT)
+		{
+			//resend packets
+		}
 	}//end while
 
 	close(sock);
+
+	//TODO: printLogString();
 
 	return EXIT_SUCCESS;
 }

@@ -11,12 +11,25 @@ typedef struct {
 	char * reset;
 } Types;
 
+typedef struct states {
+	int LISTENING;
+	int UNCONNECTED;
+	int RECEIVED;
+	int SEND_DATA;
+	int FINISH;
+	int RESET;
+	int SEND_RESET;
+	int TIMEOUT;
+} States;
+
 #define TRUE 1
 #define FALSE 0
 #define BUFFER_SIZE 1024
 #define _MAGIC_ "CSC361"
 
+
 static const Types TYPES = {"DAT", "ACK", "SYN", "FIN", "RST"};
+static const States states = {0, 1, 2, 3, 4, 5, 6, 7};
 
 void getTimeString(char * buffer);
 
@@ -44,6 +57,6 @@ int directoryExists(char * directory);
 
 void printLogString(char * request, char * response, struct sockaddr_in sa, char * file);
 
-int typeToState(char * recv);
+int typeStrToInt(char * recv);
 
 #endif
