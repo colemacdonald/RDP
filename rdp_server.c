@@ -274,6 +274,7 @@ int finishConnection()
 
 int fileTranserComplete(int ack)
 {
+	printf("ftc ack: %d\n", ack);
 	if(ack > seq0 + 2)
 		return TRUE;
 	return FALSE;
