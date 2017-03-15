@@ -215,6 +215,8 @@ int sendDataPacket(int seqn, int length)
 	char header[1000];
 	generateHeaderDAT(header, seqn, length);
 
+	printf("Sending data...");
+
 	//append data to header
 	strcat(header, "This is the payload data\0");
 	
