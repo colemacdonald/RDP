@@ -349,7 +349,7 @@ int main( int argc, char ** argv )
 			}
 			state = states.RECEIVED;
 		}
-		else if(states.RECEIVED)
+		else if(state == states.RECEIVED)
 		{
 			printf("recvd:\n%s\n", request);
 
@@ -375,26 +375,26 @@ int main( int argc, char ** argv )
 
 			//TODO: do something else
 		}
-		else if(states.SEND_DATA)
+		else if(state == states.SEND_DATA)
 		{
 			if(!fileTranserComplete(ackn))
 				sendDataPacket(ackn, size);//seqn, length);
 			else
 				state = states.FINISH;
 		}
-		else if(states.FINISH)
+		else if(state == states.FINISH)
 		{
 			if(ackn != final_ack_expected)
 				sendFIN(ackn);
 			else
 				finished = TRUE;
 		}
-		else if(states.RESET)
+		else if(state == states.RESET)
 		{
 			close(sock);
 			state = states.UNCONNECTED;
 		}
-		else if(states.TIMEOUT)
+		else if(state == states.TIMEOUT)
 		{
 			//resend packets
 		}
