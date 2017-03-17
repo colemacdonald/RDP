@@ -164,23 +164,6 @@ int parse_packet_header(char * recv, char ** buffer)
 	return TRUE;
 }
 
-int parse_packet_payload(char * recv, char * buffer)
-{
-	//will be /r/n/r/n hence the +4
-	int pos = strcspn(recv, "\r\n") + 4;
-	int len = strlen(recv) - pos;
-
-	char dst[len + 1];
-	strncpy(dst, &recv[pos], len);
-	//dst now contains payload
-	dst[len] = '\0';
-
-	//printf("payload: %s\n", dst);
-	strcat(recv, dst);
-
-	return TRUE;
-}
-
 int directoryExists(char * directory)
 {
 	DIR* dir = opendir(directory);

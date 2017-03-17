@@ -20,7 +20,8 @@
 //										CONSTANTS
 ////////////////////////////////////////////////////////////////////////////////////////////
 
-#define RECV_BUFFER_SIZE 4096
+#define RECV_BUFFER_SIZE 	4096
+#define MIN_WINDOW_SIZE		512
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 //									GLOBAL VARIABLES
@@ -47,6 +48,10 @@ int 	type				= 0;
 int 	last_ack			= 0;
 
 
+int 		buffer_used		= 0;
+char 		filebuffer[RECV_BUFFER_SIZE];
+
+ 
 int 		seqn;
 int 		length;
 int 		window;
@@ -54,6 +59,8 @@ int 		window;
 ssize_t 	recsize;
 socklen_t 	fromlen;
 char 		request[BUFFER_SIZE];
+
+FILE * 		fp;
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 //									HELPER FUNCTIONS
@@ -106,6 +113,12 @@ int finishConnection()
 	return TRUE;
 }
 
+int getWindowSize()
+{
+	//TODO: what is size of header? Have to take it into account
+	return 1024;
+}
+
 void generateAckHeader(char * headerbuffer, int ackn, int window)
 {
 	char header[1000] = "CSC361 ACK \0"; //CSC361 _type _ackno _size\r\n\r\n"
@@ -121,10 +134,11 @@ void generateAckHeader(char * headerbuffer, int ackn, int window)
 	strcpy(headerbuffer, header);
 }
 
-int sendAckPacket(int seqn, int length, int window)
+int sendAckPacket(int ackn)
 {
 	char header[1000];
-	int ackn = seqn + length;
+
+	window = getWindowSize();
 
 	generateAckHeader(header, ackn, window);
 
@@ -140,10 +154,38 @@ int sendAckPacket(int seqn, int length, int window)
 	return 1;
 }
 
-int getWindowSize()
+int emptyBufferToFile()
 {
-	//TODO: what is size of header? Have to take it into account
-	return 1024;
+	fputs(filebuffer, fp);
+	buffer_used = 0;
+	filebuffer[0] = '\0';
+
+	return TRUE;
+}
+
+int parse_packet_payload(char * recv, char * buffer, int length)
+{
+	//will be /r/n/r/n hence the +4
+	int pos = strcspn(recv, "\r\n") + 4;
+	int len = strlen(recv) - pos;
+
+	if(length != len)
+		return FALSE;
+
+	if(len > RECV_BUFFER_SIZE - buffer_used)
+		return FALSE;
+
+	char dst[len + 1];
+	strncpy(dst, &recv[pos], len);
+	//dst now contains payload
+	dst[len] = '\0';
+
+	//printf("payload: %s\n", dst);
+	strcat(recv, dst);
+
+	buffer_used += len;
+
+	return TRUE;
 }
 ////////////////////////////////////////////////////////////////////////////////////////////
 //										MAIN
@@ -161,11 +203,12 @@ int main (int argc, char ** argv)
 	port_r 			= "8080"; 			//argv[2];
 	file_save_name 	= "save.txt";		//argv[3];
 
-	//prep fdset
-	int select_result;
-	fd_set read_fds;
-
-	char recvbuffer[RECV_BUFFER_SIZE];
+	fp = fopen(file_save_name, "w");
+	if(!fp)
+	{
+		printf("File with specified name could not be created. Given: %s\n", file_save_name);
+		return EXIT_FAILURE;
+	}
 
 	printf("rdpc is running on UDP port %s\n", port_r);
 
@@ -185,6 +228,7 @@ int main (int argc, char ** argv)
 		else if(state == states.LISTENING)
 		{
 			//TODO: while 'listening' empty buffer, right now recvfrom is blocking
+
 			fromlen = sizeof(sa);
 
 			recsize = recvfrom(sock, (void*) request, sizeof request, 0, (struct sockaddr*)&sa, &fromlen);
@@ -194,6 +238,15 @@ int main (int argc, char ** argv)
 				continue;
 			}
 			state = states.RECEIVED;
+		}
+		else if(state == states.EMPTY_BUFFER)
+		{
+			if(buffer_used > 0)
+			{
+				emptyBufferToFile();
+			}
+
+			state = states.LISTENING;
 		}
 		else if(state == states.RECEIVED)
 		{
@@ -217,28 +270,35 @@ int main (int argc, char ** argv)
 			if(type == iTypes.DAT)
 			{
 				//read in
-				parse_packet_payload(request, recvbuffer);
+				if(length < RECV_BUFFER_SIZE - buffer_used)
+				{
+					if(parse_packet_payload(request, filebuffer, length))
+						sendAckPacket(seqn + length);
+					//else
+					//TODO: resend ack
+				}
 
 				//TODO: Deal with data
-
-				//ack
-				sendAckPacket(seqn, length, window);
 			}
 			else if(type == iTypes.SYN)
 			{
 				//send ack
-				sendAckPacket(seqn, length, window);
+				sendAckPacket(seqn + length);
 			}
 			else if(type == iTypes.FIN)
 			{
-				sendAckPacket(seqn, length, 0);
+				sendAckPacket(seqn + length);
 				listening = FALSE;
 			}
 			else
 			{
 				//TODO: UNKNOWN
 			}
-			state = states.LISTENING;
+
+			if(window < MIN_WINDOW_SIZE)
+				state = states.EMPTY_BUFFER;
+			else
+				state = states.LISTENING;
 		}
 		else if(state == states.FINISH)
 		{
@@ -253,51 +313,16 @@ int main (int argc, char ** argv)
 		else if(state == states.TIMEOUT)
 		{
 			//TODO: resend ack
+			sendAckPacket(last_ack);
 		}
 		else
 		{
 			//TODO: UNKNOWN
 		}// end if else...
-
-		/*switch(type)
-		{
-			//DAT
-			case 1:
-				//read in
-				parse_packet_payload(request, recvbuffer);
-				//ack
-				sendAckPacket(seqn, length, window);
-				break;
-			//ACK
-			case 2:
-				//something wrong
-				break;
-			//SYN
-			case 3:
-				//send ack
-				sendAckPacket(seqn, length, window);
-				break;
-			//FIN
-			case 4:
-				//ack
-				sendAckPacket(seqn, length, 0);
-				listening = FALSE;
-				break;
-			//RST
-			case 5:
-				//toss all data
-				//clear buffers
-				//empty file
-				//ack
-				break;
-			//unknown state
-			default:
-				break;
-		}//end switch*/
-
 	}//end while
 
 	close(sock);
+	fclose(fp);
 
 	return EXIT_SUCCESS;
 }

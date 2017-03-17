@@ -28,6 +28,7 @@ typedef struct states {
 	int RESET;
 	int SEND_RESET;
 	int TIMEOUT;
+	int EMPTY_BUFFER;
 } States;
 
 #define TRUE 1
@@ -38,7 +39,7 @@ typedef struct states {
 
 static const Types TYPES = {"DAT", "ACK", "SYN", "FIN", "RST"};
 static const IntTypes iTypes = {0, 1, 2, 3, 4};
-static const States states = {0, 1, 2, 3, 4, 5, 6, 7};
+static const States states = {0, 1, 2, 3, 4, 5, 6, 7, 8};
 
 void getTimeString(char * buffer);
 
@@ -60,7 +61,7 @@ void parse_request(char * request_string, char ** buffer);
 
 int parse_packet_header(char * recv, char ** buffer);
 
-int parse_packet_payload(char * recv, char * buffer);
+//int parse_packet_payload(char * recv, char * buffer);
 
 int directoryExists(char * directory);
 
