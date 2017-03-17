@@ -31,10 +31,12 @@ typedef struct states {
 	int EMPTY_BUFFER;
 } States;
 
-#define TRUE 1
-#define FALSE 0
-#define BUFFER_SIZE 1024
-#define _MAGIC_ "CSC361"
+#define TRUE 				1
+#define FALSE 				0
+#define BUFFER_SIZE 		1024
+#define _MAGIC_ 			"CSC361"
+#define SOCK_TIMEOUT_s 		0
+#define SOCK_TIMEOUT_us		50
 
 
 static const Types TYPES = {"DAT", "ACK", "SYN", "FIN", "RST"};

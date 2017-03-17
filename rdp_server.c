@@ -108,8 +108,8 @@ int prepareSocket()
 
 	//http://forums.codeguru.com/showthread.php?353217-example-of-SO_RCVTIMEO-using-setsockopt()
 	struct timeval tv;
-	tv.tv_sec = 5;
-	tv.tv_usec = 0;
+	tv.tv_sec = SOCK_TIMEO_s;
+	tv.tv_usec = SOCK_TIMEO_us;
 	setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, (struct timeval *)&tv, sizeof(struct timeval));
 	//struct sockaddr_in sa; 
 	ssize_t recsize;

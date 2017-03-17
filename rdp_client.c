@@ -83,6 +83,12 @@ int prepareSocket()
 	//http://stackoverflow.com/questions/24194961/how-do-i-use-setsockoptso-reuseaddr
 	setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &(int){ 1 }, sizeof(int));
 
+	//http://forums.codeguru.com/showthread.php?353217-example-of-SO_RCVTIMEO-using-setsockopt()
+	struct timeval tv;
+	tv.tv_sec = SOCK_TIMEO_s;
+	tv.tv_usec = SOCK_TIMEO_us;
+	setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, (struct timeval *)&tv, sizeof(struct timeval));
+
 	//struct sockaddr_in sa; 
 	ssize_t recsize;
 	socklen_t fromlen;
