@@ -218,7 +218,7 @@ int sendSYN()
 int sendDataPacket(int seqn, int length)
 {
 	char header[1000];
-	generateHeaderDAT(header, seqn, length);
+	generateHeaderDAT(header, seqn, 24/*length*/);
 
 	//printf("Sending data...");
 
