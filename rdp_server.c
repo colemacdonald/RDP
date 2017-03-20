@@ -321,7 +321,7 @@ int main( int argc, char ** argv )
 		return EXIT_FAILURE;
 	}
 
-	printf("File read:\n");
+	printf("File read:\n%s\n", file_data);
 
 	printf("rdps is running on UDP %s:%s\n", ip_s, port_s);
 
