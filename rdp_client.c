@@ -20,7 +20,7 @@
 //										CONSTANTS
 ////////////////////////////////////////////////////////////////////////////////////////////
 
-#define RECV_BUFFER_SIZE 	4096
+#define RECV_BUFFER_SIZE 	10240
 #define MIN_WINDOW_SIZE		512
 
 ////////////////////////////////////////////////////////////////////////////////////////////
@@ -122,7 +122,8 @@ int finishConnection()
 int getWindowSize()
 {
 	//TODO: what is size of header? Have to take it into account
-	return 1024;
+
+	return RECV_BUFFER_SIZE - strlen(filebuffer);
 }
 
 void generateAckHeader(char * headerbuffer, int ackn, int window)
