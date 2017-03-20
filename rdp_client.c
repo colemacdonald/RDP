@@ -122,8 +122,10 @@ int finishConnection()
 int getWindowSize()
 {
 	//TODO: what is size of header? Have to take it into account
-
-	return RECV_BUFFER_SIZE - strlen(filebuffer);
+	int l = RECV_BUFFER_SIZE - strlen(filebuffer);
+	if(l < MIN_WINDOW_SIZE)
+		l = MIN_WINDOW_SIZE;
+	return l;
 }
 
 void generateAckHeader(char * headerbuffer, int ackn, int window)
