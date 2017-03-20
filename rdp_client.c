@@ -62,6 +62,8 @@ char 		request[BUFFER_SIZE];
 
 FILE * 		fp;
 
+int 		timer 			= 0;
+
 ////////////////////////////////////////////////////////////////////////////////////////////
 //									HELPER FUNCTIONS
 ////////////////////////////////////////////////////////////////////////////////////////////
@@ -220,6 +222,7 @@ int main (int argc, char ** argv)
 	}
 
 	printf("rdpc is running on UDP port %s\n", port_r);
+	printf("%d", getTimeMS());
 
 	int state = states.UNCONNECTED;
 

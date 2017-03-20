@@ -14,6 +14,8 @@
 #include <time.h>
 #include <arpa/inet.h>
 #include <stdio.h>
+#include <math.h>
+#include <time.h>
 
 #include "helper.h"
 
@@ -223,4 +225,18 @@ int typeStrToInt(char * recv)
 	{
 		return -1;
 	}
+}
+
+int getTimeMS()
+{
+	long            ms; // Milliseconds
+    time_t          s;  // Seconds
+    struct timespec spec;
+
+    clock_gettime(CLOCK_REALTIME, &spec);
+
+    s  = spec.tv_sec;
+    ms = round(spec.tv_nsec / 1.0e6); // Convert nanoseconds to milliseconds
+
+    return ms;
 }

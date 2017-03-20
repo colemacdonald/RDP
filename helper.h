@@ -37,6 +37,7 @@ typedef struct states {
 #define _MAGIC_ 			"CSC361"
 #define SOCK_TIMEOUT_s 		0
 #define SOCK_TIMEOUT_us		50
+#define INIT_PKT_TO		    200
 
 
 static const Types TYPES = {"DAT", "ACK", "SYN", "FIN", "RST"};
@@ -70,5 +71,7 @@ int directoryExists(char * directory);
 void printLogString(char * request, char * response, struct sockaddr_in sa, char * file);
 
 int typeStrToInt(char * recv);
+
+int getTimeMS();
 
 #endif

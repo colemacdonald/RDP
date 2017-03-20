@@ -64,6 +64,9 @@ int 		wsize;
 ssize_t 	recsize;
 socklen_t 	fromlen;
 char 		request[BUFFER_SIZE];
+
+int 		pkt_timeout 		= INIT_PKT_TO;
+int 		timer;
 ////////////////////////////////////////////////////////////////////////////////////////////
 //									HELPER FUNCTIONS
 ////////////////////////////////////////////////////////////////////////////////////////////
@@ -191,6 +194,7 @@ int sendPacket(char * data)
 {
 	printf("Sending:\n%s\n", data);
 	int s = sendto(sock, data, strlen(data) + 1, 0, (struct sockaddr*)&sa_r, sizeof sa_r);
+	//timer = System.currentTimeMillis();
 	if(s < 0)
 	{
 		return FALSE;
@@ -381,13 +385,6 @@ int main( int argc, char ** argv )
 			printf("recvd:\n%s\n", request);
 
 			char * headerinfo[4];
-			//ex request: "CSC361 _type _ackno _size\r\n\r\n"
-			/*if(!parse_packet(request, headerinfo))
-			{
-				//TODO: Failure
-				printf("Could not be properly parsed.");
-				continue;
-			}*/
 
 			char tmp[strlen(request) + 1];
 			strcpy(tmp, request);
