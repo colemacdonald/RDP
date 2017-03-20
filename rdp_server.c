@@ -21,6 +21,7 @@
 //										CONSTANTS
 ////////////////////////////////////////////////////////////////////////////////////////////
 
+#define MAX_PAYLOAD_SIZE 1024
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 //									GLOBAL VARIABLES
@@ -58,7 +59,7 @@ int 	final_ack_expected		= 0;
 
 int 		type;
 int 		ackn;
-int 		size;
+int 		wsize;
 
 ssize_t 	recsize;
 socklen_t 	fromlen;
@@ -395,7 +396,7 @@ int main( int argc, char ** argv )
 
 			type = typeStrToInt(headerinfo[1]);
 			ackn = atoi(headerinfo[2]);
-			size = atoi(headerinfo[3]);
+			wsize = atoi(headerinfo[3]);
 
 			state = states.SEND_DATA;
 
@@ -406,7 +407,8 @@ int main( int argc, char ** argv )
 			if(!fileTranserComplete(ackn))
 			{
 				state = states.LISTENING;
-				sendDataPacket(ackn, size, file_data);//seqn, length);
+				for(int sent = 0; sent < wsize; sent += MAX_PAYLOAD_SIZE)
+					sendDataPacket(ackn, MAX_PAYLOAD_SIZE, file_data);//seqn, length);
 			}
 			else
 				state = states.FINISH;

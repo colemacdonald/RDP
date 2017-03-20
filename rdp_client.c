@@ -282,7 +282,9 @@ int main (int argc, char ** argv)
 				if(length < RECV_BUFFER_SIZE - buffer_used)
 				{
 					if(parse_packet_payload(request, filebuffer, length))
+					{
 						sendAckPacket(seqn + length);
+					}
 					//else
 					//TODO: resend ack
 				}
