@@ -240,6 +240,7 @@ int main (int argc, char ** argv)
 			if(recsize < 0)
 			{
 				//printf("Error occured.\n");
+				emptyBufferToFile();
 				continue;
 			}
 			state = states.RECEIVED;
