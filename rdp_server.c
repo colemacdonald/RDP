@@ -409,7 +409,7 @@ int main( int argc, char ** argv )
 				state = states.LISTENING;
 				int sent;
 				for(sent = 0; sent < wsize; sent += MAX_PAYLOAD_SIZE)
-					sendDataPacket(ackn, MAX_PAYLOAD_SIZE, file_data);//seqn, length);
+					sendDataPacket(ackn + sent, MAX_PAYLOAD_SIZE, file_data);//seqn, length);
 			}
 			else
 				state = states.FINISH;
