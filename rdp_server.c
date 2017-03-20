@@ -407,7 +407,8 @@ int main( int argc, char ** argv )
 			if(!fileTranserComplete(ackn))
 			{
 				state = states.LISTENING;
-				for(int sent = 0; sent < wsize; sent += MAX_PAYLOAD_SIZE)
+				int sent;
+				for(sent = 0; sent < wsize; sent += MAX_PAYLOAD_SIZE)
 					sendDataPacket(ackn, MAX_PAYLOAD_SIZE, file_data);//seqn, length);
 			}
 			else
