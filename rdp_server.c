@@ -51,7 +51,7 @@ int 	seq0;
 int 	last_seq;
 int 	last_length;
 
-char *	file_data;
+//char *	file_data;
 int 	file_size;
 int 	final_ack_expected		= 0;
 
@@ -67,7 +67,7 @@ char 		request[BUFFER_SIZE];
 //									HELPER FUNCTIONS
 ////////////////////////////////////////////////////////////////////////////////////////////
 
-int readFileToMemory(char * filename)
+int readFileToMemory(char * filename, char * fdata)
 {
 	if(!fileExists(filename))
 		return FALSE;
@@ -87,7 +87,7 @@ int readFileToMemory(char * filename)
 
 	printf("filebuffer:\n%s\n", filebuffer);
 	fclose(fp);
-	strcpy(file_data, filebuffer);
+	strcpy(fdata, filebuffer);
 
 	return TRUE;
 }
@@ -310,18 +310,25 @@ int main( int argc, char ** argv )
 
 	if(!fileExists(f_to_send))
 	{
-		printf("does not exist\n");
+		printf("File does not exist.\n");
 		return EXIT_FAILURE;
 	}
 
-	if(!readFileToMemory(f_to_send))
-	{
-		printf("Specified file could not be read. Given: %s\n", f_to_send);
-		close(sock);
-		return EXIT_FAILURE;
-	}
+	FILE * fp = fopen(f_to_send, "r");
+	long int bytes_read;
 
-	printf("File read:\n%s\n", file_data);
+	//determine file length
+	fseek(fp, 0L, SEEK_END);
+	file_size = ftell(fp);
+	fseek(fp, 0L, SEEK_SET);
+
+	char file_data[file_size + 1];
+	file_data[file_size] = '\0';
+	//read file
+	bytes_read = fread(file_data, sizeof(char), file_size, fp);
+
+	printf("file_data:\n%s\n", file_data);
+	fclose(fp);
 
 	printf("rdps is running on UDP %s:%s\n", ip_s, port_s);
 
