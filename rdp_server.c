@@ -314,14 +314,14 @@ int main( int argc, char ** argv )
 		return EXIT_FAILURE;
 	}
 
-	/*if(!readFileToMemory(f_to_send))
+	if(!readFileToMemory(f_to_send))
 	{
 		printf("Specified file could not be read. Given: %s\n", f_to_send);
 		close(sock);
 		return EXIT_FAILURE;
 	}
 
-	printf("File read:\n%s\n", file_data);*/
+	printf("File read:\n");
 
 	printf("rdps is running on UDP %s:%s\n", ip_s, port_s);
 
