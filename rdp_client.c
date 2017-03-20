@@ -294,6 +294,7 @@ int main (int argc, char ** argv)
 			else if(type == iTypes.FIN)
 			{
 				sendAckPacket(seqn + length);
+				emptyBufferToFile();
 				listening = FALSE;
 			}
 			else
