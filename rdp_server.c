@@ -215,15 +215,19 @@ int sendSYN()
 }
 
 // TODO: Implement
-int sendDataPacket(int seqn, int length)
+int sendDataPacket(int seqn, int length, char * fdata)
 {
-	char header[1000];
+	char header[2000];
 	generateHeaderDAT(header, seqn, 24/*length*/);
 
 	//printf("Sending data...");
 
+	//char payload[length + 1];
+
+	strncat(header, &fdata[seqn - seq0], length);
+
+
 	//append data to header
-	strcat(header, "This is the payload data\0");
 	
 	if(!sendPacket(header))
 	{
@@ -394,7 +398,7 @@ int main( int argc, char ** argv )
 			if(!fileTranserComplete(ackn))
 			{
 				state = states.LISTENING;
-				sendDataPacket(ackn, size);//seqn, length);
+				sendDataPacket(ackn, size, file_data);//seqn, length);
 			}
 			else
 				state = states.FINISH;
