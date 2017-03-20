@@ -168,6 +168,7 @@ int emptyBufferToFile()
 	fputs(filebuffer, fp);
 	buffer_used = 0;
 	filebuffer[0] = '\0';
+	printf("filebuufer:\n%s\n", filebuffer);
 
 	return TRUE;
 }
