@@ -236,7 +236,7 @@ int getTimeMS()
     clock_gettime(CLOCK_REALTIME, &spec);
 
     s  = spec.tv_sec;
-    ms = round(spec.tv_nsec / 1.0e6); // Convert nanoseconds to milliseconds
+    ms = spec.tv_nsec / 1.0e6; // Convert nanoseconds to milliseconds
 
     return ms;
 }
