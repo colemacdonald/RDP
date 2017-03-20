@@ -87,7 +87,7 @@ int readFileToMemory(char * filename)
 
 	printf("filebuffer:\n%s\n", filebuffer);
 	fclose(fp);
-	file_data = filebuffer;
+	strcpy(file_data, filebuffer);
 
 	return TRUE;
 }
