@@ -181,13 +181,12 @@ int parse_packet_payload(char * recv, char * buffer, int length)
 	if(len > RECV_BUFFER_SIZE - buffer_used)
 		return FALSE;
 
-	char dst[len + 1];
+	char * dst[len + 1];
 	strncpy(dst, &recv[pos], len);
 	//dst now contains payload
 	dst[len] = '\0';
 
-	//printf("payload: %s\n", dst);
-	strcat(recv, dst);
+	strcat(buffer, dst);
 
 	buffer_used += len;
 
