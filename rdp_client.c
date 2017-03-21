@@ -45,12 +45,11 @@ int 	rst_packs_sent 		= 0;
 int 	duration 			= 0;
 
 int 	type				= 0;
-int 	last_ack			= 0;
-
-
+int 	last_ack_sent		= 0;
+int 	seq_expecting		= 0;
+	
 int 		buffer_used		= 0;
 char 		filebuffer[RECV_BUFFER_SIZE];
-
  
 int 		seqn;
 int 		length;
@@ -63,7 +62,7 @@ char 		request[BUFFER_SIZE];
 FILE * 		fp;
 
 int 		timer 			= 0;
-
+int 		pkt_timeout 	= INIT_PKT_TO;
 ////////////////////////////////////////////////////////////////////////////////////////////
 //									HELPER FUNCTIONS
 ////////////////////////////////////////////////////////////////////////////////////////////
@@ -151,6 +150,9 @@ int sendAckPacket(int ackn)
 
 	window = getWindowSize();
 
+	if(window < MIN_WINDOW_SIZE)
+		window = 0;
+
 	generateAckHeader(header, ackn, window);
 
 	printf("Sending:\n%s\n", header);
@@ -158,19 +160,22 @@ int sendAckPacket(int ackn)
 	if(sendto(sock, header, strlen(header) + 1, 0, (struct sockaddr*)&sa, sizeof sa) < 0)
 	{
 		printf("Could not send ack, errno: %d", errno);
+		return FALSE;
 	}
 	ack_packs_sent += 1;
-	last_ack = ackn;
+	last_ack_sent = ackn;
 
-	return 1;
+	return TRUE;
 }
 
 int emptyBufferToFile()
 {
-	fputs(filebuffer, fp);
-	buffer_used = 0;
-	filebuffer[0] = '\0';
-	printf("filebuufer:\n%s\n", filebuffer);
+	if(strlen(filebuffer) > 0)
+	{
+		fputs(filebuffer, fp);
+		buffer_used = 0;
+		filebuffer[0] = '\0';
+	}
 
 	return TRUE;
 }
@@ -198,6 +203,11 @@ int parse_packet_payload(char * recv, char * buffer, int length)
 
 	return TRUE;
 }
+
+int resendLastAck()
+{
+	return sendAckPacket(last_ack_sent);
+}
 ////////////////////////////////////////////////////////////////////////////////////////////
 //										MAIN
 ////////////////////////////////////////////////////////////////////////////////////////////
@@ -222,7 +232,7 @@ int main (int argc, char ** argv)
 	}
 
 	printf("rdpc is running on UDP port %s\n", port_r);
-	printf("%d", getTimeMS());
+	//printf("%d", getTimeMS());
 
 	int state = states.UNCONNECTED;
 
@@ -239,10 +249,16 @@ int main (int argc, char ** argv)
 		}
 		else if(state == states.LISTENING)
 		{
-			//TODO: while 'listening' empty buffer, right now recvfrom is blocking
+			if(window == 0 && getWindowSize() > 5 * MIN_WINDOW_SIZE)
+				sendAckPacket(seq_expecting);
+
+			if(timer + pkt_timeout < getTimeMS())
+			{
+				state = states.TIMEOUT;
+				continue;
+			}
 
 			fromlen = sizeof(sa);
-
 			recsize = recvfrom(sock, (void*) request, sizeof request, 0, (struct sockaddr*)&sa, &fromlen);
 			if(recsize < 0)
 			{
@@ -265,16 +281,16 @@ int main (int argc, char ** argv)
 		{
 			printf("recvd:\n%s\n", request);
 
-			char * headerinfo[4];
+			pkt_timeout = INIT_PKT_TO;
 
 			char tmp[strlen(request) + 1];
 			strcpy(tmp, request);
 
+			char * headerinfo[4];
 			parse_packet_header(tmp, headerinfo);
 
 			type = typeStrToInt(headerinfo[1]);
 
-			//printf("state = %d\n", state);
 			seqn = atoi(headerinfo[2]);
 			length = atoi(headerinfo[3]);
 
@@ -282,18 +298,23 @@ int main (int argc, char ** argv)
 
 			if(type == iTypes.DAT)
 			{
-				//read in
-				if(length < RECV_BUFFER_SIZE - buffer_used)
+				if(seqn == seq_expecting)
 				{
-					if(parse_packet_payload(request, filebuffer, length))
+					if(length < RECV_BUFFER_SIZE - buffer_used)
 					{
-						sendAckPacket(seqn + length);
+						if(parse_packet_payload(request, filebuffer, length))
+						{
+							//sendAckPacket(seqn + length);
+							seq_expecting = seqn + length;
+						}
+						else
+						{
+							resendLastAck();
+						}
 					}
-					//else
-					//TODO: resend ack
 				}
-
-				//TODO: Deal with data
+				else
+					sendAckPacket(seq_expecting);
 			}
 			else if(type == iTypes.SYN)
 			{
@@ -311,10 +332,7 @@ int main (int argc, char ** argv)
 				//TODO: UNKNOWN
 			}
 
-			if(window < MIN_WINDOW_SIZE)
-				state = states.EMPTY_BUFFER;
-			else
-				state = states.LISTENING;
+			state = states.LISTENING;
 		}
 		else if(state == states.FINISH)
 		{
@@ -329,7 +347,7 @@ int main (int argc, char ** argv)
 		else if(state == states.TIMEOUT)
 		{
 			//TODO: resend ack
-			sendAckPacket(last_ack);
+			resendLastAck();
 		}
 		else
 		{

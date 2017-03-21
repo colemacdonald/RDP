@@ -21,7 +21,7 @@
 //										CONSTANTS
 ////////////////////////////////////////////////////////////////////////////////////////////
 
-#define MAX_PAYLOAD_SIZE 100
+#define MAX_PAYLOAD_SIZE 1000
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 //									GLOBAL VARIABLES
@@ -49,8 +49,9 @@ int 	rst_packs_recv			= 0;
 int 	start_time				= 0;
 
 int 	seq0;
-int 	last_seq;
+int 	last_ack;
 int 	last_length;
+int 	last_window;
 
 //char *	file_data;
 int 	file_size;
@@ -194,7 +195,7 @@ int sendPacket(char * data)
 {
 	printf("Sending:\n%s\n", data);
 	int s = sendto(sock, data, strlen(data) + 1, 0, (struct sockaddr*)&sa_r, sizeof sa_r);
-	//timer = System.currentTimeMillis();
+	timer = getTimeMS();
 	if(s < 0)
 	{
 		return FALSE;
@@ -370,6 +371,12 @@ int main( int argc, char ** argv )
 			//TODO: what to do while listening??
 			//recvfrom is blocking
 
+			if(timer + pkt_timeout < getTimeMS())
+			{
+				state = states.TIMEOUT;
+				continue;
+			}
+
 			fromlen = sizeof(sa_s);
 
 			recsize = recvfrom(sock, (void*) request, sizeof request, 0, (struct sockaddr*)&sa_s, &fromlen);
@@ -395,6 +402,15 @@ int main( int argc, char ** argv )
 			ackn = atoi(headerinfo[2]);
 			wsize = atoi(headerinfo[3]);
 
+			if(ackn > last_ack + last_window)
+			{
+				state = states.RESET;
+				continue;
+			}
+
+			last_window = wsize;
+			last_ack = ackn;
+
 			state = states.SEND_DATA;
 
 			//TODO: do something else
@@ -406,7 +422,7 @@ int main( int argc, char ** argv )
 				state = states.LISTENING;
 				int sent;
 				for(sent = 0; sent < wsize; sent += MAX_PAYLOAD_SIZE)
-					sendDataPacket(ackn + sent, MAX_PAYLOAD_SIZE, file_data);//seqn, length);
+					sendDataPacket(ackn + sent, MAX_PAYLOAD_SIZE, file_data);
 			}
 			else
 				state = states.FINISH;
@@ -432,6 +448,10 @@ int main( int argc, char ** argv )
 		else if(state == states.TIMEOUT)
 		{
 			//resend packets
+			pkt_timeout *= 2;
+			int sent;
+			for(sent = 0; sent < last_window; sent += MAX_PAYLOAD_SIZE)
+				sendDataPacket(last_ack + sent, MAX_PAYLOAD_SIZE, file_data);
 		}
 		else
 		{
