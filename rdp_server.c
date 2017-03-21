@@ -36,18 +36,6 @@ char * 	f_to_send;
 struct 	sockaddr_in sa_s;
 struct 	sockaddr_in sa_r;
 
-int 	total_data_bytes_sent 	= 0;
-int 	unique_data_bytes_sent 	= 0;
-int 	total_data_packs_sent	= 0;
-int 	unique_data_packs_sent	= 0;
-int 	syn_packs_sent			= 0;
-int 	fin_packs_sent			= 0;
-int 	rst_packs_sent			= 0;
-int 	ack_packs_recv			= 0;
-int 	rst_packs_recv			= 0;
-
-int 	start_time				= 0;
-
 int 	seq0;
 int 	last_ack;
 int 	last_length;
@@ -68,9 +56,36 @@ char 		request[BUFFER_SIZE];
 
 int 		pkt_timeout 		= INIT_PKT_TO;
 int 		timer;
+
+int 	total_data_bytes_sent 	= 0;
+int 	unique_data_bytes_sent 	= 0;
+int 	total_data_packs_sent	= 0;
+int 	unique_data_packs_sent	= 0;
+int 	syn_packs_sent			= 0;
+int 	fin_packs_sent			= 0;
+int 	rst_packs_sent			= 0;
+int 	ack_packs_recv			= 0;
+int 	rst_packs_recv			= 0;
+
+int 	start_time				= 0;
+
 ////////////////////////////////////////////////////////////////////////////////////////////
 //									HELPER FUNCTIONS
 ////////////////////////////////////////////////////////////////////////////////////////////
+
+void printLogString()
+{
+	printf("total data bytes sent: %d\n", total_data_bytes_sent);
+	printf("unique data bytes sent: %d\n");
+	printf("total data packets sent: %d\n");
+	printf("unique data packets sent: %d\n");
+	printf("SYN packets sent: %d\n");
+	printf("FIN packets sent: %d\n");
+	printf("RST packets sent: %d\n");
+	printf("ACK packets received: %d\n");
+	printf("RST packets received: %d\n");
+	printf("total time duration (second): %d\n");
+}
 
 int readFileToMemory(char * filename, char * fdata)
 {
@@ -193,7 +208,7 @@ int unique_packet()
 
 int sendPacket(char * data)
 {
-	printf("Sending:\n%s\n", data);
+	//printf("Sending:\n%s\n", data);
 	int s = sendto(sock, data, strlen(data) + 1, 0, (struct sockaddr*)&sa_r, sizeof sa_r);
 	timer = getTimeMS();
 	if(s < 0)
@@ -203,7 +218,6 @@ int sendPacket(char * data)
 	return TRUE;
 }
 
-// TODO: Implement
 int sendSYN()
 {
 	char header[1000];
@@ -220,7 +234,6 @@ int sendSYN()
 	return TRUE;
 }
 
-// TODO: Implement
 int sendDataPacket(int seqn, int length, char * fdata)
 {
 	char header[2000];
@@ -380,9 +393,6 @@ int main( int argc, char ** argv )
 		}
 		else if(state == states.LISTENING)
 		{
-			//TODO: what to do while listening??
-			//recvfrom is blocking
-
 			if(timer + pkt_timeout < getTimeMS())
 			{
 				state = states.TIMEOUT;

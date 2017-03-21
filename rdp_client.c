@@ -20,7 +20,7 @@
 //										CONSTANTS
 ////////////////////////////////////////////////////////////////////////////////////////////
 
-#define RECV_BUFFER_SIZE 	2048
+#define RECV_BUFFER_SIZE 	10240
 #define MIN_WINDOW_SIZE		512
 
 ////////////////////////////////////////////////////////////////////////////////////////////
@@ -155,7 +155,7 @@ int sendAckPacket(int ackn)
 
 	generateAckHeader(header, ackn, window);
 
-	printf("Sending:\n%s\n", header);
+	//printf("Sending:\n%s\n", header);
 
 	if(sendto(sock, header, strlen(header) + 1, 0, (struct sockaddr*)&sa, sizeof sa) < 0)
 	{
@@ -254,7 +254,6 @@ int main (int argc, char ** argv)
 		{
 			if(getWindowSize() > MIN_WINDOW_SIZE && seqn != 0)
 			{
-				printf("in here\n");
 				sendAckPacket(seq_expecting);
 			}
 
@@ -285,7 +284,7 @@ int main (int argc, char ** argv)
 		}
 		else if(state == states.RECEIVED)
 		{
-			printf("recvd:\n%s\n", request);
+			//printf("recvd:\n%s\n", request);
 
 			pkt_timeout = INIT_PKT_TO;
 
