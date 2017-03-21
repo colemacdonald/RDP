@@ -37,7 +37,7 @@ typedef struct states {
 #define _MAGIC_ 			"CSC361"
 #define SOCK_TIMEOUT_s 		0
 #define SOCK_TIMEOUT_us		200
-#define INIT_PKT_TO		    200
+#define INIT_PKT_TO		    200000
 
 
 static const Types TYPES = {"DAT", "ACK", "SYN", "FIN", "RST"};
