@@ -249,11 +249,11 @@ int main (int argc, char ** argv)
 		}
 		else if(state == states.LISTENING)
 		{
-			if(window == 0 && getWindowSize() > 5 * MIN_WINDOW_SIZE && seqn != 0)
+			if(window == 0 && getWindowSize() > 5 * MIN_WINDOW_SIZE && FALSE)
 			{
 				sendAckPacket(seq_expecting);
 			}
-			
+
 			if(timer + pkt_timeout < getTimeMS())
 			{
 				state = states.TIMEOUT;
