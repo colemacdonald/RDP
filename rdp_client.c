@@ -252,7 +252,7 @@ int main (int argc, char ** argv)
 		}
 		else if(state == states.LISTENING)
 		{
-			if(window == 0 && getWindowSize() > MIN_WINDOW_SIZE && seqn != 0)
+			if(getWindowSize() > MIN_WINDOW_SIZE && seqn != 0)
 			{
 				printf("in here\n");
 				sendAckPacket(seq_expecting);
