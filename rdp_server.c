@@ -423,7 +423,17 @@ int main( int argc, char ** argv )
 				state = states.LISTENING;
 				int sent;
 				for(sent = 0; sent < wsize; sent += MAX_PAYLOAD_SIZE)
+				{
+					fromlen = sizeof(sa_s);
+					recsize = recvfrom(sock, (void*) request, sizeof request, 0, (struct sockaddr*)&sa_s, &fromlen);
+					if(recsize != -1)
+					{
+						//printf("Error occured.\n");
+						state = states.RECEIVED;
+						break;
+					}
 					sendDataPacket(ackn + sent, MAX_PAYLOAD_SIZE, file_data);
+				}
 			}
 			else
 				state = states.FINISH;
