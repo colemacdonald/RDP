@@ -251,6 +251,7 @@ int main (int argc, char ** argv)
 		{
 			if(window == 0 && getWindowSize() > 5 * MIN_WINDOW_SIZE && seqn != 0)
 			{
+				printf("in here\n");
 				sendAckPacket(seq_expecting);
 			}
 
