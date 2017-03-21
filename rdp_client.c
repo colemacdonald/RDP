@@ -125,7 +125,7 @@ int getWindowSize()
 	//TODO: what is size of header? Have to take it into account
 	int l = RECV_BUFFER_SIZE - strlen(filebuffer);
 	if(l < MIN_WINDOW_SIZE)
-		l = MIN_WINDOW_SIZE;
+		l = 0;
 	return l;
 }
 
