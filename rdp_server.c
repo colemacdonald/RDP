@@ -405,6 +405,7 @@ int main( int argc, char ** argv )
 			if(ackn > last_ack + last_window)
 			{
 				state = states.RESET;
+				printf("rst\n");
 				continue;
 			}
 
