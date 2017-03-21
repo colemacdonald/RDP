@@ -314,7 +314,7 @@ int main (int argc, char ** argv)
 							seq_expecting = seqn + length;
 							//printf("seq_exp: %d\n", seq_expecting);
 							if(window < MIN_WINDOW_SIZE)
-								sendAckPacket();
+								sendAckPacket(seq_expecting);
 							//timer = 
 						}
 						else
