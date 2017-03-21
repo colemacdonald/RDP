@@ -302,6 +302,17 @@ int fileTranserComplete(int ack)
 	return FALSE;
 }
 
+int sockReady4Recv()
+{
+	recsize = recvfrom(sock, (void*) request, sizeof request, 0, (struct sockaddr*)&sa_s, &fromlen);
+	if(recsize != -1)
+	{
+		//printf("Error occured.\n");
+		return TRUE;
+	}
+	return FALSE;
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////
 //										MAIN
 ////////////////////////////////////////////////////////////////////////////////////////////
@@ -424,15 +435,13 @@ int main( int argc, char ** argv )
 				int sent;
 				for(sent = 0; sent < wsize; sent += MAX_PAYLOAD_SIZE)
 				{
-					fromlen = sizeof(sa_s);
-					recsize = recvfrom(sock, (void*) request, sizeof request, 0, (struct sockaddr*)&sa_s, &fromlen);
-					if(recsize != -1)
+					if(!sockReady4Recv())
 					{
-						//printf("Error occured.\n");
 						state = states.RECEIVED;
-						break;
+						sent = wsize;
 					}
-					sendDataPacket(ackn + sent, MAX_PAYLOAD_SIZE, file_data);
+					else
+						sendDataPacket(ackn + sent, MAX_PAYLOAD_SIZE, file_data);
 				}
 			}
 			else
@@ -461,8 +470,14 @@ int main( int argc, char ** argv )
 			//resend packets
 			pkt_timeout *= 2;
 			int sent;
-			for(sent = 0; sent < last_window; sent += MAX_PAYLOAD_SIZE)
+			if(!sockReady4Recv())
+			{
+				state = states.RECEIVED;
+				sent = wsize;
+			}
+			else
 				sendDataPacket(last_ack + sent, MAX_PAYLOAD_SIZE, file_data);
+				
 		}
 		else
 		{
