@@ -312,7 +312,7 @@ int main (int argc, char ** argv)
 						{
 							//sendAckPacket(seqn + length);
 							seq_expecting = seqn + length;
-							//printf("seq_exp: %d\n", seq_expecting);
+							printf("seq_exp: %d\n win: %d\n", seq_expecting, window);
 							if(window < MIN_WINDOW_SIZE)
 								sendAckPacket(seq_expecting);
 							//timer = 
