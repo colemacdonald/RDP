@@ -188,8 +188,10 @@ int parse_packet_payload(char * recv, char * buffer, int length)
 	int len = strlen(recv) - pos;
 
 	if(length != len)
+	{
+		printf("client, line 192: length does not match\n");
 		return FALSE;
-
+	}
 	if(len > RECV_BUFFER_SIZE - buffer_used)
 		return FALSE;
 
