@@ -435,7 +435,7 @@ int main( int argc, char ** argv )
 				int sent;
 				for(sent = 0; sent < wsize; sent += MAX_PAYLOAD_SIZE)
 				{
-					if(!sockReady4Recv())
+					if(sockReady4Recv())
 					{
 						state = states.RECEIVED;
 						sent = wsize;
@@ -470,7 +470,7 @@ int main( int argc, char ** argv )
 			//resend packets
 			pkt_timeout *= 2;
 			int sent;
-			if(!sockReady4Recv())
+			if(sockReady4Recv())
 			{
 				state = states.RECEIVED;
 				sent = wsize;
