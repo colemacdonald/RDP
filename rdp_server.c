@@ -357,7 +357,7 @@ int main( int argc, char ** argv )
 	//read file
 	bytes_read = fread(file_data, sizeof(char), file_size, fp);
 
-	printf("file_data:\n%s\n", file_data);
+	//printf("file_data:\n%s\n", file_data);
 	fclose(fp);
 
 	printf("rdps is running on UDP %s:%s\n", ip_s, port_s);
