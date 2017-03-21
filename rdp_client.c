@@ -351,6 +351,7 @@ int main (int argc, char ** argv)
 		else if(state == states.TIMEOUT)
 		{
 			//TODO: resend ack
+			printf("in TO\n");
 			resendLastAck();
 		}
 		else
