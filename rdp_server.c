@@ -336,7 +336,7 @@ int main( int argc, char ** argv )
 	port_s = "8080";
 	ip_r = "10.10.1.100";
 	port_r = "8080";
-	f_to_send = "public/Modern_Control_Engineering.pdf";
+	f_to_send = "public/big.txt";
 
 	if(!fileExists(f_to_send))
 	{
