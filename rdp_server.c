@@ -298,7 +298,7 @@ int finishConnection()
 
 int fileTranserComplete(int ack)
 {
-	if(ack > seq0 + 2)
+	if(ack > seq0 + file_size)
 		return TRUE;
 	return FALSE;
 }
