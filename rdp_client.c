@@ -45,8 +45,8 @@ int 	rst_packs_sent 		= 0;
 int 	duration 			= 0;
 
 int 	type				= 0;
-int 	last_ack_sent		= 0;
-int 	seq_expecting		= 0;
+int 	last_ack_sent		= 1;
+int 	seq_expecting		= 2;
 	
 int 		buffer_used		= 0;
 char 		filebuffer[RECV_BUFFER_SIZE];
