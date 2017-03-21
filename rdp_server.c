@@ -402,7 +402,7 @@ int main( int argc, char ** argv )
 			ackn = atoi(headerinfo[2]);
 			wsize = atoi(headerinfo[3]);
 
-			if(ackn > last_ack + last_window)
+			if(ackn > last_ack + last_window && ackn != seq0 + 1)
 			{
 				state = states.RESET;
 				printf("rst\n");
