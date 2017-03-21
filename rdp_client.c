@@ -164,6 +164,7 @@ int sendAckPacket(int ackn)
 	}
 	ack_packs_sent += 1;
 	last_ack_sent = ackn;
+	seq_expecting = ackn;
 
 	return TRUE;
 }
