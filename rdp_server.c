@@ -238,7 +238,7 @@ int sendDataPacket(int seqn, int length, char * fdata)
 
 	//char payload[length + 1];
 	// +1 for syn
-	strncat(header, &fdata[seqn - (seq0 + 1)], length);
+	strncat(header, &fdata[seqn - (seq0 + 1)], l);
 
 
 	//append data to header
