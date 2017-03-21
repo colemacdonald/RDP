@@ -308,9 +308,11 @@ int main (int argc, char ** argv)
 						{
 							//sendAckPacket(seqn + length);
 							seq_expecting = seqn + length;
+							//timer = 
 						}
 						else
 						{
+							printf("resending 1\n");
 							resendLastAck();
 						}
 					}
