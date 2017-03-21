@@ -51,7 +51,7 @@ int 	seq_expecting		= 0;
 int 		buffer_used		= 0;
 char 		filebuffer[RECV_BUFFER_SIZE];
  
-int 		seqn;
+int 		seq 			= 0;
 int 		length;
 int 		window;
 
@@ -249,7 +249,7 @@ int main (int argc, char ** argv)
 		}
 		else if(state == states.LISTENING)
 		{
-			if(window == 0 && getWindowSize() > 5 * MIN_WINDOW_SIZE)
+			if(window == 0 && getWindowSize() > 5 * MIN_WINDOW_SIZE && seq != 0)
 				sendAckPacket(seq_expecting);
 
 			if(timer + pkt_timeout < getTimeMS())
