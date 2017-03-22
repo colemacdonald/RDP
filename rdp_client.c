@@ -31,7 +31,7 @@ int 	sock;
 char * 	ip_r;
 char * 	port_r;
 char * 	ip_s;
-char *	port_s;
+char 	port_s[10];
 char * 	file_save_name;
 struct 	sockaddr_in sa;
 
