@@ -469,6 +469,7 @@ int main( int argc, char ** argv )
 		{
 			if(timer + pkt_timeout < getTimeMS())
 			{
+				printf("TIMEOUT\n");
 				state = states.TIMEOUT;
 				continue;
 			}
@@ -486,7 +487,7 @@ int main( int argc, char ** argv )
 		else if(state == states.RECEIVED)
 		{
 			//printf("recvd:\n%s\n", request);
-
+			pkt_timeout = INIT_PKT_TO;
 			connected = TRUE;
 
 			char * headerinfo[4];
@@ -573,8 +574,7 @@ int main( int argc, char ** argv )
 		else if(state == states.TIMEOUT)
 		{
 			//resend packets
-			printf("TIMEOUT\n");
-			pkt_timeout *= 2;
+			pkt_timeout = 2 * pkt_timeout;
 			int sent = 0;
 			if(sockReady4Recv())
 			{
