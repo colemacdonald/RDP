@@ -33,20 +33,9 @@ char * 	port_r;
 char * 	file_save_name;
 struct 	sockaddr_in sa;
 
-int 	bytes_recv 			= 0;
-int 	unique_bytes_recv 	= 0;
-int 	packs_recv 			= 0;
-int 	unique_packs_recv 	= 0;
-int 	syn_packs_recv 		= 0;	
-int 	fin_packs_recv 		= 0;
-int 	rst_packs_recv 		= 0;
-int 	ack_packs_sent 		= 0;
-int 	rst_packs_sent 		= 0;
-int 	duration 			= 0;
-
 int 	type				= 0;
-int 	last_ack_sent		= 1;
-int 	seq_expecting		= 2;
+int 	last_ack_sent		= 0;
+int 	seq_expecting		= 0;
 	
 int 		buffer_used		= 0;
 char 		filebuffer[RECV_BUFFER_SIZE];
@@ -63,10 +52,34 @@ FILE * 		fp;
 
 int 		timer 			= 0;
 int 		pkt_timeout 	= INIT_PKT_TO;
+
+int 	bytes_recv 			= 0;
+int 	unique_bytes_recv 	= 0;
+int 	packs_recv 			= 0;
+int 	unique_packs_recv 	= 0;
+int 	syn_packs_recv 		= 0;	
+int 	fin_packs_recv 		= 0;
+int 	rst_packs_recv 		= 0;
+int 	ack_packs_sent 		= 0;
+int 	rst_packs_sent 		= 0;
+int 	start_time			= 0;
+int 	finish_time 		= 0;
 ////////////////////////////////////////////////////////////////////////////////////////////
 //									HELPER FUNCTIONS
 ////////////////////////////////////////////////////////////////////////////////////////////
-
+void printSummary()
+{
+	printf("total data bytes received: %d\n", bytes_recv);
+	printf("unique data bytes received: %d\n", unique_bytes_recv);
+	printf("total data packets received: %d\n", packs_recv);
+	printf("unique data packets received: %d\n", unique_packs_recv);
+	printf("SYN packets received: %d\n", syn_packs_recv);
+	printf("FIN packets received: %d\n", fin_packs_recv);
+	printf("RST packets received: %d\n", rst_packs_recv);
+	printf("ACK packets sent: %d\n", ack_packs_sent);
+	printf("RST packets sent: %d\n", rst_packs_sent);
+	printf("total time duration (second): %d\n", (finish_time - start_time) / 1000);
+}
 
 int prepareSocket()
 {
@@ -162,7 +175,7 @@ int sendAckPacket(int ackn)
 		printf("Could not send ack, errno: %d", errno);
 		return FALSE;
 	}
-	ack_packs_sent += 1;
+	ack_packs_sent++;
 	last_ack_sent = ackn;
 	seq_expecting = ackn;
 
@@ -187,9 +200,17 @@ int parse_packet_payload(char * recv, char * buffer, int length)
 	int pos = strcspn(recv, "\r\n") + 4;
 	int len = strlen(recv) - pos;
 
+	bytes_recv += len;
+	packs_recv++;
+
+	if(seqn == seq_expecting)
+	{
+		unique_bytes_recv += len;
+		unique_packs_recv++;
+	}
 	if(length != len)
 	{
-		printf("client, line 192: length does not match. Header: %d, Payload: %d\n", length, len);
+		//printf("client, line 192: length does not match. Header: %d, Payload: %d\n", length, len);
 		return FALSE;
 	}
 	if(len > RECV_BUFFER_SIZE - buffer_used)
@@ -240,6 +261,8 @@ int main (int argc, char ** argv)
 	int state = states.UNCONNECTED;
 
 	int listening = TRUE;
+
+	start_time = getTimeMS();
 	while (listening)
 	{	
 		if(state == states.UNCONNECTED)
@@ -331,13 +354,19 @@ int main (int argc, char ** argv)
 			else if(type == iTypes.SYN)
 			{
 				//send ack
+				syn_packs_recv++;
 				sendAckPacket(seqn + 1);
 			}
 			else if(type == iTypes.FIN)
 			{
+				fin_packs_recv++;
 				sendAckPacket(seqn + length);
 				emptyBufferToFile();
 				listening = FALSE;
+			}
+			else if(type == iTypes.RST)
+			{
+				rst_packs_recv++;
 			}
 			else
 			{
@@ -367,6 +396,9 @@ int main (int argc, char ** argv)
 			//TODO: UNKNOWN
 		}// end if else...
 	}//end while
+
+	finish_time = getTimeMS();
+	printSummary();
 
 	close(sock);
 	fclose(fp);

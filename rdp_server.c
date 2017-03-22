@@ -40,6 +40,7 @@ int 	seq0;
 int 	last_ack;
 int 	last_length;
 int 	last_window;
+int 	largest_syn_sent 		= 0;
 
 //char *	file_data;
 int 	file_size;
@@ -68,23 +69,82 @@ int 	ack_packs_recv			= 0;
 int 	rst_packs_recv			= 0;
 
 int 	start_time				= 0;
+int 	finish_time				= 0;
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 //									HELPER FUNCTIONS
 ////////////////////////////////////////////////////////////////////////////////////////////
 
-void printLogString()
+void printSummary()
 {
 	printf("total data bytes sent: %d\n", total_data_bytes_sent);
-	printf("unique data bytes sent: %d\n");
-	printf("total data packets sent: %d\n");
-	printf("unique data packets sent: %d\n");
-	printf("SYN packets sent: %d\n");
-	printf("FIN packets sent: %d\n");
-	printf("RST packets sent: %d\n");
-	printf("ACK packets received: %d\n");
-	printf("RST packets received: %d\n");
-	printf("total time duration (second): %d\n");
+	printf("unique data bytes sent: %d\n", unique_data_bytes_sent);
+	printf("total data packets sent: %d\n", total_data_packs_sent);
+	printf("unique data packets sent: %d\n", unique_data_packs_sent);
+	printf("SYN packets sent: %d\n", syn_packs_sent);
+	printf("FIN packets sent: %d\n", fin_packs_sent);
+	printf("RST packets sent: %d\n", rst_packs_sent);
+	printf("ACK packets received: %d\n", ack_packs_recv);
+	printf("RST packets received: %d\n", rst_packs_recv);
+	printf("total time duration (second): %d\n", (finish_time - start_time) / 1000);
+}
+
+void printLogLineSend(int etype, int ptype, int num1, int num2)
+{
+	//HH:MM:SS.us event_type sip:spt dip:dpt packet_type seqno/ackno length/window
+	char timestr[1000];
+	getTimeString(timestr);
+
+	char event;
+	if(etype == 0)
+		event = 's';
+	else if(etype == 1)
+		event = 'S';
+	else if(etype == 2)
+		event = 'r';
+	else if(etype == 3)
+		event = 'R';
+
+	char pts[4];
+	if(ptype == iTypes.DAT)
+		strcpy(pts, "DAT");
+	else if(ptype == iTypes.SYN)
+		strcpy(pts, "SYN");
+	else if(ptype == iTypes.RST)
+		strcpy(pts, "RST");
+	else if(ptype == iTypes.FIN)
+		strcpy(pts, "FIN");
+
+	printf("%s %c %s:%s %s:%s %s %d %d\n", timestr, event, ip_s, port_s, ip_r, port_r, pts, num1, num2);
+}
+
+void printLogLineRecv(int type, int ptype, int num1, int num2)
+{
+	//HH:MM:SS.us event_type sip:spt dip:dpt packet_type seqno/ackno length/window
+	char timestr[1000];
+	getTimeString(timestr);
+
+	char event;
+	if(type == 0)
+		event = 's';
+	else if(type == 1)
+		event = 'S';
+	else if(type == 2)
+		event = 'r';
+	else if(type == 3)
+		event = 'R';
+
+	char pts[4];
+	if(ptype == iTypes.DAT)
+		strcpy(pts, "DAT");
+	else if(ptype == iTypes.SYN)
+		strcpy(pts, "SYN");
+	else if(ptype == iTypes.RST)
+		strcpy(pts, "RST");
+	else if(ptype == iTypes.FIN)
+		strcpy(pts, "FIN");
+
+	printf("%s %c %s:%s %s:%s %s %d %d\n", timestr, event, ip_r, port_r, ip_s, port_s, pts, num1, num2);
 }
 
 int readFileToMemory(char * filename, char * fdata)
@@ -200,12 +260,6 @@ void generateHeaderDAT(char * headerbuffer, int seqn, int length)
 	strcpy(headerbuffer, header);
 }
 
-// TODO: Implement
-int unique_packet()
-{
-	return TRUE;
-}
-
 int sendPacket(char * data)
 {
 	//printf("Sending:\n%s\n", data);
@@ -220,6 +274,12 @@ int sendPacket(char * data)
 
 int sendSYN()
 {
+	int type;
+	if(seq0 == 0)
+		type = 0;
+	else
+		type = 1;
+
 	char header[1000];
 	generateHeaderSYN(header);
 	//printf("%s\n", header);
@@ -229,6 +289,8 @@ int sendSYN()
 		printf("Could not send SYN, errno: %d\n", errno);
 		return FALSE;
 	}
+
+	printLogLineSend(type, iTypes.SYN, seq0, 1);
 
 	syn_packs_sent += 1;
 	return TRUE;
@@ -263,15 +325,20 @@ int sendDataPacket(int seqn, int length, char * fdata)
 		return FALSE;
 	}
 
-	total_data_bytes_sent += length;
-
-	if(unique_packet())
+	if(seqn > largest_syn_sent)
 	{
 		unique_data_bytes_sent += length;
 		unique_data_packs_sent += 1;
+		largest_syn_sent = seqn;
+		printLogLineSend(0, iTypes.DAT, seqn, length);
 	}
+	else
+		printLogLineSend(1, iTypes.DAT, seqn, length);
 
+	total_data_bytes_sent += length;
 	total_data_packs_sent += 1;
+
+
 	return TRUE;
 }
 
@@ -294,6 +361,11 @@ int sendFIN(int seqn)
 	char header[1000];
 	generateHeaderFIN(seqn, header);
 
+	if(final_ack_expected == seqn + 1)
+		printLogLineSend(1, iTypes.FIN, seqn, 1);
+	else
+		printLogLineSend(0, iTypes.FIN, seqn, 1);
+
 	final_ack_expected = seqn + 1;
 
 	if(!sendPacket(header))
@@ -301,11 +373,6 @@ int sendFIN(int seqn)
 		printf("Could not send FIN, errno = %d\n", errno);
 		return FALSE;
 	}
-	return TRUE;
-}
-
-int finishConnection()
-{
 	return TRUE;
 }
 
@@ -379,6 +446,8 @@ int main( int argc, char ** argv )
 
 	int finished = FALSE;
 
+	start_time = getTimeMS();
+
 	while (!finished)
 	{
 		if(state == states.UNCONNECTED)
@@ -411,7 +480,7 @@ int main( int argc, char ** argv )
 		}
 		else if(state == states.RECEIVED)
 		{
-			printf("recvd:\n%s\n", request);
+			//printf("recvd:\n%s\n", request);
 
 			char * headerinfo[4];
 
@@ -421,8 +490,26 @@ int main( int argc, char ** argv )
 			parse_packet_header(tmp, headerinfo);
 
 			type = typeStrToInt(headerinfo[1]);
+
+			if(type == iTypes.ACK)
+			{
+				ack_packs_recv++;
+				if(ackn > last_ack)
+					printLogLineRecv(2, iTypes.ACK, ackn, wsize);
+				else
+					printLogLineRecv(3, iTypes.ACK, ackn, wsize);	
+			}
+			else if(type == iTypes.RST)
+			{
+				rst_packs_recv++;
+				if(ackn > last_ack)
+					printLogLineRecv(2, iTypes.RST, ackn, wsize);
+				else
+					printLogLineRecv(3, iTypes.RST, ackn, wsize);
+			}
+
 			ackn = atoi(headerinfo[2]);
-			wsize = atoi(headerinfo[3]);
+			wsize = atoi(headerinfo[3]);	
 
 			if(ackn > last_ack + last_window && ackn != seq0 + 1)
 			{
@@ -495,10 +582,11 @@ int main( int argc, char ** argv )
 			//TODO: UNKNOWN
 		}
 	}//end while
+	
+	finish_time = getTimeMS();
+	printSummary();
 
 	close(sock);
-
-	//TODO: printLogString();
 
 	return EXIT_SUCCESS;
 }
