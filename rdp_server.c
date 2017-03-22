@@ -573,7 +573,7 @@ int main( int argc, char ** argv )
 		else if(state == states.TIMEOUT)
 		{
 			//resend packets
-			console.log("TIMEOUT\n");
+			printf("TIMEOUT\n");
 			pkt_timeout *= 2;
 			int sent = 0;
 			if(sockReady4Recv())
