@@ -494,6 +494,9 @@ int main( int argc, char ** argv )
 
 			type = typeStrToInt(headerinfo[1]);
 
+			ackn = atoi(headerinfo[2]);
+			wsize = atoi(headerinfo[3]);
+
 			if(type == iTypes.ACK)
 			{
 				ack_packs_recv++;
@@ -510,9 +513,6 @@ int main( int argc, char ** argv )
 				else
 					printLogLineRecv(3, iTypes.RST, ackn, wsize);
 			}
-
-			ackn = atoi(headerinfo[2]);
-			wsize = atoi(headerinfo[3]);	
 
 			if(ackn > last_ack + last_window && ackn != seq0 + 1)
 			{
