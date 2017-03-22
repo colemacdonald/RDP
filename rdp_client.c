@@ -417,7 +417,7 @@ int main (int argc, char ** argv)
 						if(seqn != 0) sendAckPacket(seq_expecting);
 				}
 				else
-					sendAckPacket(seq_expecting);
+					if(seqn != 0) sendAckPacket(seq_expecting);
 			}
 			else if(type == iTypes.SYN)
 			{
