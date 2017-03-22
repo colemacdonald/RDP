@@ -340,7 +340,6 @@ int main (int argc, char ** argv)
 		{
 			if(getWindowSize() > MIN_WINDOW_SIZE && seqn != 0)
 			{
-				printf("here");
 				sendAckPacket(seq_expecting);
 			}
 
@@ -415,7 +414,7 @@ int main (int argc, char ** argv)
 						}
 					}
 					else
-						sendAckPacket(seq_expecting);
+						if(seqn != 0) sendAckPacket(seq_expecting);
 				}
 				else
 					sendAckPacket(seq_expecting);
