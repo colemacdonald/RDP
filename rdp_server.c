@@ -588,8 +588,8 @@ int main( int argc, char ** argv )
 			else
 			{
 				sendDataPacket(last_ack + sent, MAX_PAYLOAD_SIZE, file_data);
-				state = states.LISTENING;
 			}
+			state = states.LISTENING;
 		}
 		else
 		{
