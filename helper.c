@@ -229,7 +229,18 @@ int typeStrToInt(char * recv)
 
 int getTimeMS()
 {
-	return 0;
+	uintmax_t       ms; // Milliseconds
+    time_t          s;  // Seconds
+    struct timespec spec;
+
+    s = time(NULL);
+
+    //s  = spec.tv_sec;
+    //ms = spec.tv_nsec / 1.0e6; // Convert nanoseconds to milliseconds
+
+    ms = (uintmax_t)s;
+
+    return ms;
 }
 
 int getTimeS()
