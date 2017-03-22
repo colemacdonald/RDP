@@ -73,6 +73,8 @@ void printSummary()
 {
 	finish_time = getTimeMS();
 
+	printf("start: %d --- finish: %d\n", start_time, finish_time);
+
 	printf("total data bytes received: %d\n", bytes_recv);
 	printf("unique data bytes received: %d\n", unique_bytes_recv);
 	printf("total data packets received: %d\n", packs_recv);
