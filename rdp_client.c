@@ -43,7 +43,7 @@ int 		buffer_used		= 0;
 char 		filebuffer[RECV_BUFFER_SIZE];
  
 int 		seqn 			= 0;
-int 		length;
+int 		length			= -1;
 int 		window;
 
 ssize_t 	recsize;
@@ -233,10 +233,13 @@ int sendAckPacket(int ackn)
 		return FALSE;
 	}
 
-	if(ackn > last_ack_sent)
-		printLogLineSend(0, iTypes.ACK, ackn, window);
-	else
-		printLogLineSend(1, iTypes.ACK, ackn, window);
+	if(length != -1)
+	{
+		if(ackn > last_ack_sent)
+			printLogLineSend(0, iTypes.ACK, ackn, window);
+		else
+			printLogLineSend(1, iTypes.ACK, ackn, window);
+	}
 
 	ack_packs_sent++;
 	last_ack_sent = ackn;
@@ -414,10 +417,10 @@ int main (int argc, char ** argv)
 						}
 					}
 					else
-						if(seqn != 0) sendAckPacket(seq_expecting);
+						sendAckPacket(seq_expecting);
 				}
 				else
-					if(seqn != 0) sendAckPacket(seq_expecting);
+					sendAckPacket(seq_expecting);
 			}
 			else if(type == iTypes.SYN)
 			{
