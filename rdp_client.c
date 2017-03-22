@@ -71,9 +71,9 @@ int 	finish_time 		= 0;
 ////////////////////////////////////////////////////////////////////////////////////////////
 void printSummary()
 {
-	finish_time = getTimeMS();
+	finish_time = getTimeS();
 
-	printf("start: %d --- finish: %d\n", start_time, finish_time);
+	//printf("start: %d --- finish: %d\n", start_time, finish_time);
 
 	printf("total data bytes received: %d\n", bytes_recv);
 	printf("unique data bytes received: %d\n", unique_bytes_recv);
@@ -84,7 +84,7 @@ void printSummary()
 	printf("RST packets received: %d\n", rst_packs_recv);
 	printf("ACK packets sent: %d\n", ack_packs_sent);
 	printf("RST packets sent: %d\n", rst_packs_sent);
-	printf("total time duration (second): %d\n", (finish_time - start_time) / 1000);
+	printf("total time duration (second): %d\n", (finish_time - start_time));
 }
 
 void printLogLineSend(int etype, int ptype, int num1, int num2)
@@ -325,7 +325,7 @@ int main (int argc, char ** argv)
 
 	int listening = TRUE;
 
-	start_time = getTimeMS();
+	start_time = getTimeS();
 	while (listening)
 	{	
 		if(state == states.UNCONNECTED)
@@ -488,7 +488,7 @@ int main (int argc, char ** argv)
 		}// end if else...
 	}//end while
 
-	finish_time = getTimeMS();
+	finish_time = getTimeS();
 	printSummary();
 
 	close(sock);

@@ -74,4 +74,6 @@ int typeStrToInt(char * recv);
 
 int getTimeMS();
 
+int getTimeS();
+
 #endif

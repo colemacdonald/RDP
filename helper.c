@@ -229,6 +229,11 @@ int typeStrToInt(char * recv)
 
 int getTimeMS()
 {
+	return 0;
+}
+
+int getTimeS()
+{
 	uintmax_t       ms; // Milliseconds
     time_t          s;  // Seconds
     struct timespec spec;

@@ -86,7 +86,7 @@ void printSummary()
 	printf("RST packets sent: %d\n", rst_packs_sent);
 	printf("ACK packets received: %d\n", ack_packs_recv);
 	printf("RST packets received: %d\n", rst_packs_recv);
-	printf("total time duration (second): %d\n", (finish_time - start_time) / 1000);
+	printf("total time duration (second): %d\n", (finish_time - start_time));
 }
 
 void printLogLineSend(int etype, int ptype, int num1, int num2)
@@ -449,7 +449,7 @@ int main( int argc, char ** argv )
 
 	int finished = FALSE;
 
-	start_time = getTimeMS();
+	start_time = getTimeS();
 
 	while (!finished)
 	{
@@ -586,7 +586,7 @@ int main( int argc, char ** argv )
 		}
 	}//end while
 	
-	finish_time = getTimeMS();
+	finish_time = getTimeS();
 	printSummary();
 
 	close(sock);
