@@ -369,6 +369,7 @@ int sendFIN(int seqn)
 		printLogLineSend(0, iTypes.FIN, seqn, 1);
 
 	final_ack_expected = seqn + 1;
+	fin_packs_sent++;
 
 	if(!sendPacket(header))
 	{

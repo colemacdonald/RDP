@@ -360,7 +360,7 @@ int main (int argc, char ** argv)
 			else if(type == iTypes.FIN)
 			{
 				fin_packs_recv++;
-				sendAckPacket(seqn + length);
+				sendAckPacket(seqn + 1);
 				emptyBufferToFile();
 				listening = FALSE;
 			}
