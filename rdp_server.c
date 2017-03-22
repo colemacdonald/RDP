@@ -71,6 +71,8 @@ int 	rst_packs_recv			= 0;
 int 	start_time				= 0;
 int 	finish_time				= 0;
 
+int 	connected				= FALSE;
+
 ////////////////////////////////////////////////////////////////////////////////////////////
 //									HELPER FUNCTIONS
 ////////////////////////////////////////////////////////////////////////////////////////////
@@ -485,6 +487,8 @@ int main( int argc, char ** argv )
 		{
 			//printf("recvd:\n%s\n", request);
 
+			connected = TRUE;
+
 			char * headerinfo[4];
 
 			char tmp[strlen(request) + 1];
@@ -570,15 +574,21 @@ int main( int argc, char ** argv )
 		{
 			//resend packets
 			pkt_timeout *= 2;
-			int sent;
+			int sent = 0;
 			if(sockReady4Recv())
 			{
 				state = states.RECEIVED;
 				sent = wsize;
 			}
+			else if(!connected)
+			{
+				sendSyn();
+			}
 			else
+			{
 				sendDataPacket(last_ack + sent, MAX_PAYLOAD_SIZE, file_data);
-				
+				state = states.LISTENING;
+			}
 		}
 		else
 		{
