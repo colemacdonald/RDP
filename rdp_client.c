@@ -338,7 +338,7 @@ int main (int argc, char ** argv)
 		}
 		else if(state == states.LISTENING)
 		{
-			if(getWindowSize() > MIN_WINDOW_SIZE && seqn != 0)
+			if(getWindowSize() > MIN_WINDOW_SIZE && ip_s != NULL)
 			{
 				sendAckPacket(seq_expecting);
 			}
