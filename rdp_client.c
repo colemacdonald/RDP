@@ -30,6 +30,8 @@
 int 	sock;
 char * 	ip_r;
 char * 	port_r;
+char * 	ip_s;
+char *	port_s;
 char * 	file_save_name;
 struct 	sockaddr_in sa;
 
@@ -69,6 +71,8 @@ int 	finish_time 		= 0;
 ////////////////////////////////////////////////////////////////////////////////////////////
 void printSummary()
 {
+	finish_time = getTimeMS();
+
 	printf("total data bytes received: %d\n", bytes_recv);
 	printf("unique data bytes received: %d\n", unique_bytes_recv);
 	printf("total data packets received: %d\n", packs_recv);
@@ -79,6 +83,68 @@ void printSummary()
 	printf("ACK packets sent: %d\n", ack_packs_sent);
 	printf("RST packets sent: %d\n", rst_packs_sent);
 	printf("total time duration (second): %d\n", (finish_time - start_time) / 1000);
+}
+
+void printLogLineSend(int etype, int ptype, int num1, int num2)
+{
+	//HH:MM:SS.us event_type sip:spt dip:dpt packet_type seqno/ackno length/window
+	char timestr[1000];
+	getTimeString(timestr);
+
+	char event;
+	if(etype == 0)
+		event = 's';
+	else if(etype == 1)
+		event = 'S';
+	else if(etype == 2)
+		event = 'r';
+	else if(etype == 3)
+		event = 'R';
+
+	char pts[4];
+	if(ptype == iTypes.DAT)
+		strcpy(pts, "DAT");
+	else if(ptype == iTypes.SYN)
+		strcpy(pts, "SYN");
+	else if(ptype == iTypes.RST)
+		strcpy(pts, "RST");
+	else if(ptype == iTypes.FIN)
+		strcpy(pts, "FIN");
+	else if(ptype == iTypes.ACK)
+		strcpy(pts, "ACK");
+
+	printf("%s %c %s:%s %s:%s %s %d %d\n", timestr, event, ip_s, port_s, ip_r, port_r, pts, num1, num2);
+}
+
+void printLogLineRecv(int type, int ptype, int num1, int num2)
+{
+	//HH:MM:SS.us event_type sip:spt dip:dpt packet_type seqno/ackno length/window
+	char timestr[1000];
+	getTimeString(timestr);
+
+	char event;
+	if(type == 0)
+		event = 's';
+	else if(type == 1)
+		event = 'S';
+	else if(type == 2)
+		event = 'r';
+	else if(type == 3)
+		event = 'R';
+
+	char pts[4];
+	if(ptype == iTypes.DAT)
+		strcpy(pts, "DAT");
+	else if(ptype == iTypes.SYN)
+		strcpy(pts, "SYN");
+	else if(ptype == iTypes.RST)
+		strcpy(pts, "RST");
+	else if(ptype == iTypes.FIN)
+		strcpy(pts, "FIN");
+	else if(ptype == iTypes.ACK)
+		strcpy(pts, "ACK");
+
+	printf("%s %c %s:%s %s:%s %s %d %d\n", timestr, event, ip_r, port_r, ip_s, port_s, pts, num1, num2);
 }
 
 int prepareSocket()
@@ -123,19 +189,8 @@ int prepareSocket()
 	return TRUE;
 }
 
-int establishConnection()
-{
-	return TRUE;
-}
-
-int finishConnection()
-{
-	return TRUE;
-}
-
 int getWindowSize()
 {
-	//TODO: what is size of header? Have to take it into account
 	int l = RECV_BUFFER_SIZE - strlen(filebuffer);
 	if(l < MIN_WINDOW_SIZE)
 		l = 0;
@@ -175,6 +230,12 @@ int sendAckPacket(int ackn)
 		printf("Could not send ack, errno: %d", errno);
 		return FALSE;
 	}
+
+	if(ackn > last_ack_sent)
+		printLogLineSend(0, iTypes.ACK, ackn, window);
+	else
+		printLogLineSend(1, iTypes.ACK, ackn, window);
+
 	ack_packs_sent++;
 	last_ack_sent = ackn;
 	seq_expecting = ackn;
@@ -326,6 +387,11 @@ int main (int argc, char ** argv)
 
 			if(type == iTypes.DAT)
 			{
+				if(seqn < seq_expecting)
+					printLogLineRecv(3, iTypes.DAT, seqn, length);
+				else
+					printLogLineRecv(2, iTypes.DAT, seqn, length);
+
 				if(seqn == seq_expecting)
 				{
 					if(length < RECV_BUFFER_SIZE - buffer_used)
@@ -354,19 +420,38 @@ int main (int argc, char ** argv)
 			else if(type == iTypes.SYN)
 			{
 				//send ack
+				ip_s = inet_ntoa(sa.sin_addr);
+				sprintf (port_s, "%u", sa.sin_port);
+
 				syn_packs_recv++;
+				if(seqn < seq_expecting)
+					printLogLineRecv(3, iTypes.SYN, seqn, length);
+				else
+					printLogLineRecv(2, iTypes.SYN, seqn, length);
+
 				sendAckPacket(seqn + 1);
 			}
 			else if(type == iTypes.FIN)
 			{
 				fin_packs_recv++;
+				if(seqn < seq_expecting)
+					printLogLineRecv(3, iTypes.SYN, seqn, length);
+				else
+					printLogLineRecv(2, iTypes.SYN, seqn, length);
+
 				sendAckPacket(seqn + 1);
 				emptyBufferToFile();
 				listening = FALSE;
 			}
 			else if(type == iTypes.RST)
 			{
+				if(seqn < seq_expecting)
+					printLogLineRecv(3, iTypes.SYN, seqn, length);
+				else
+					printLogLineRecv(2, iTypes.SYN, seqn, length);
+
 				rst_packs_recv++;
+				state = states.RESET;
 			}
 			else
 			{
@@ -382,13 +467,17 @@ int main (int argc, char ** argv)
 		else if(state == states.RESET)
 		{
 			close(sock);
-			//TODO: clear buffer and empty file
+			fclose(fp);
+			fp = fopen(file_save_name, "w");
+
+			memset(filebuffer, '\0', RECV_BUFFER_SIZE);
+
 			state = states.UNCONNECTED;
 		}
 		else if(state == states.TIMEOUT)
 		{
 			//TODO: resend ack
-			printf("in TO\n");
+			//printf("in TO\n");
 			resendLastAck();
 		}
 		else
