@@ -334,14 +334,14 @@ int main (int argc, char ** argv)
 						{
 							//sendAckPacket(seqn + length);
 							seq_expecting = seqn + length;
-							printf("seq_exp: %d\n win: %d\n", seq_expecting, window);
+							//printf("seq_exp: %d\nwin: %d\n", seq_expecting, window);
 							if(window < MIN_WINDOW_SIZE)
 								sendAckPacket(seq_expecting);
 							//timer = 
 						}
 						else
 						{
-							printf("resending 1\n");
+							//printf("resending 1\n");
 							resendLastAck();
 						}
 					}

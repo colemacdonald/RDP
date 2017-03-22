@@ -143,6 +143,8 @@ void printLogLineRecv(int type, int ptype, int num1, int num2)
 		strcpy(pts, "RST");
 	else if(ptype == iTypes.FIN)
 		strcpy(pts, "FIN");
+	else if(ptype == iTypes.ACK)
+		strcpy(pts, "ACK");
 
 	printf("%s %c %s:%s %s:%s %s %d %d\n", timestr, event, ip_r, port_r, ip_s, port_s, pts, num1, num2);
 }
