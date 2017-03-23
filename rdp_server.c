@@ -568,7 +568,12 @@ int main( int argc, char ** argv )
 		}
 		else if(state == states.FINISH)
 		{
-			if(ackn != final_ack_expected || fin_to > 4)
+			if(fin_to > 3)
+			{
+				finished = TRUE;
+				continue;
+			}
+			if(ackn != final_ack_expected)
 			{
 				state = states.LISTENING;
 				sendFIN(ackn);
