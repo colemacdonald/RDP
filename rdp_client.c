@@ -420,6 +420,9 @@ int main (int argc, char ** argv)
 							seq_expecting = seqn + length;
 							//printf("seq_exp: %d\nwin: %d\n", seq_expecting, window);
 							if(window < MIN_WINDOW_SIZE)
+							{
+								
+							}
 								//sendAckPacket(seq_expecting);
 							//timer = 
 						}
@@ -430,9 +433,15 @@ int main (int argc, char ** argv)
 						}
 					}
 					else
+					{
+
+					}
 						//sendAckPacket(seq_expecting);
 				}
 				else
+				{
+
+				}
 					//sendAckPacket(seq_expecting);
 			}
 			else if(type == iTypes.SYN)
