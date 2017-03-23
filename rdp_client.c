@@ -478,6 +478,7 @@ int main (int argc, char ** argv)
 				else
 					printLogLineRecv(2, iTypes.SYN, seqn, length);
 
+				sendAckPacket(seqn + 1);
 				rst_packs_recv++;
 				state = states.RESET;
 			}

@@ -250,6 +250,18 @@ void generateHeaderSYN(char * headerbuffer)
 	strcpy(headerbuffer, header);
 }
 
+void generateHeaderRST(int seqn, char * headerbuffer)
+{
+	char header[1000] = "CSC361 RST \0";
+	char seqstr[10];
+	sprintf(seqstr, "%d", seqn);
+	strcat(header, seqstr);
+
+	strcat(header, " 1\r\n\r\n\0");
+
+	strcpy(headerbuffer, header);
+}
+
 void generateHeaderDAT(char * headerbuffer, int seqn, int length)
 {
 	char header[1000] = "CSC361 DAT \0"; //_seq _ackno _length _size\r\n\r\n"
@@ -292,13 +304,36 @@ int sendSYN()
 
 	if(!sendPacket(header))
 	{
-		printf("Could not send SYN, errno: %d\n", errno);
+		//printf("Could not send SYN, errno: %d\n", errno);
 		return FALSE;
 	}
 
 	printLogLineSend(type, iTypes.SYN, seq0, 1);
 
 	syn_packs_sent += 1;
+	return TRUE;
+}
+
+int sendRST(int seqn)
+{
+	char header[1000];
+	generateHeaderRST(seqn, header);
+
+	int type;
+
+	if(rst_seqn == -2)
+		type = 1;
+	else
+		type = 0;
+
+	if(!sendPacket(header))
+	{
+		return FALSE;
+	}
+
+	printLogLineSend(type, iTypes.RST, seqn, 1);
+
+	rst_packs_sent++;
 	return TRUE;
 }
 
@@ -584,6 +619,7 @@ int main( int argc, char ** argv )
 		else if(state == states.RESET)
 		{
 			close(sock);
+			sendRST(last_ack);
 			state = states.UNCONNECTED;
 		}
 		else if(state == states.TIMEOUT)
