@@ -416,15 +416,9 @@ int main (int argc, char ** argv)
 					{
 						if(parse_packet_payload(request, filebuffer, length))
 						{
-							//sendAckPacket(seqn + length);
 							seq_expecting = seqn + length;
-							//printf("seq_exp: %d\nwin: %d\n", seq_expecting, window);
-							if(window < MIN_WINDOW_SIZE)
-							{
-								
-							}
-								//sendAckPacket(seq_expecting);
-							//timer = 
+							/*if(window < MIN_WINDOW_SIZE)
+								sendAckPacket(seq_expecting);*/
 						}
 						else
 						{
@@ -432,17 +426,11 @@ int main (int argc, char ** argv)
 							resendLastAck();
 						}
 					}
-					else
-					{
-
-					}
-						//sendAckPacket(seq_expecting);
+					/*else
+						sendAckPacket(seq_expecting);*/
 				}
 				else
-				{
-
-				}
-					//sendAckPacket(seq_expecting);
+					sendAckPacket(seq_expecting);
 			}
 			else if(type == iTypes.SYN)
 			{
