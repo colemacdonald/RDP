@@ -12,6 +12,7 @@
 #include <ctype.h>
 #include <sys/stat.h>
 #include <time.h>
+#include <sys/time.h>
 #include <arpa/inet.h>
 #include <stdio.h>
 
@@ -405,7 +406,7 @@ int sockReady4Recv()
 
 int main( int argc, char ** argv )
 {
-	printf("us: %d\n", getTimeMS());
+	printf("us: %llu\n", getTimeMS());
 	if( argc != 6)
 	{
 		ip_s = "192.168.1.100";
@@ -425,7 +426,7 @@ int main( int argc, char ** argv )
 		f_to_send = argv[5];
 	}
 
-	printf("us: %d\n", getTimeMS());
+	printf("us: %llu\n", getTimeMS());
 
 	if(!fileExists(f_to_send))
 	{
@@ -455,7 +456,7 @@ int main( int argc, char ** argv )
 
 	int finished = FALSE;
 
-	printf("us: %d\n", getTimeMS());
+	printf("us: %llu\n", getTimeMS());
 
 	start_time = getTimeS();
 
