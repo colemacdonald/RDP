@@ -73,7 +73,7 @@ void printLogString(char * request, char * response, struct sockaddr_in sa, char
 
 int typeStrToInt(char * recv);
 
-int getTimeMS();
+unsigned long long getTimeMS();
 
 int getTimeS();
 
