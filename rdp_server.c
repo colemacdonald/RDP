@@ -426,6 +426,8 @@ int main( int argc, char ** argv )
 		f_to_send = argv[5];
 	}
 
+	printf("us: %d\n", getTimeMS());
+
 	if(!fileExists(f_to_send))
 	{
 		printf("File does not exist.\n");
