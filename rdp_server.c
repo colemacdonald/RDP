@@ -548,7 +548,7 @@ int main( int argc, char ** argv )
 				int sent;
 				for(sent = 0; sent < wsize; sent += MAX_PAYLOAD_SIZE)
 				{
-					if((sent / MAX_PAYLOAD_SIZE) % 4 == 3)
+					if((sent / MAX_PAYLOAD_SIZE) % 4 == 0)
 					{
 						if(sockReady4Recv())
 						{
