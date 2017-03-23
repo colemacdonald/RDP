@@ -356,7 +356,7 @@ int sendDataPacket(int seqn, int length, char * fdata)
 
 	//char payload[length + 1];
 	// +1 for syn
-	printf("here");
+	//printf("here");
 	strncat(header, &fdata[seqn - (seq0 + 1)], l);
 	strcat(header, "\0");
 
