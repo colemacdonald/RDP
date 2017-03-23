@@ -412,8 +412,8 @@ int main (int argc, char ** argv)
 					{
 						sendAckPacket(seq_expecting);
 					}*/
-					if(last_ack_sent != seq_expecting)
-						sendAckPacket(seq_expecting);
+					//if(last_ack_sent != seq_expecting)
+					sendAckPacket(seq_expecting);
 				}
 				else
 				{
