@@ -405,7 +405,7 @@ int main (int argc, char ** argv)
 				}
 				else
 				{
-					unique_bytes_recv += len;
+					unique_bytes_recv += length;
 					unique_packs_recv++;
 					printLogLineRecv(2, iTypes.DAT, seqn, length);
 				}
