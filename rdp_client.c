@@ -37,7 +37,8 @@ struct 	sockaddr_in sa;
 
 int 	type				= 0;
 int 	last_ack_sent		= 0;
-int 	seq_expecting		= 0;
+int 	seq_expecting		= 0;/*
+int 	largest_seqn		= 0;*/
 	
 int 		buffer_used		= 0;
 char 		filebuffer[RECV_BUFFER_SIZE];
@@ -403,7 +404,7 @@ int main (int argc, char ** argv)
 				bytes_recv += length;
 				packs_recv++;
 
-				if(seqn < seq_expecting)
+				if(seqn != seq_expecting)
 				{
 					printLogLineRecv(3, iTypes.DAT, seqn, length);
 					sendAckPacket(seq_expecting);
