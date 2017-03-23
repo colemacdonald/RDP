@@ -66,6 +66,9 @@ int 	ack_packs_sent 		= 0;
 int 	rst_packs_sent 		= 0;
 int 	start_time			= 0;
 int 	finish_time 		= 0;
+
+int 	chunks_expecting	= 0;
+int 	chunks_recv			= 0;
 ////////////////////////////////////////////////////////////////////////////////////////////
 //									HELPER FUNCTIONS
 ////////////////////////////////////////////////////////////////////////////////////////////
@@ -241,6 +244,9 @@ int sendAckPacket(int ackn)
 			printLogLineSend(1, iTypes.ACK, ackn, window);
 	}
 
+	chunks_recv = 0;
+	chunks_expecting = (window % MAX_PAYLOAD_SIZE == 0) ? (window / MAX_PAYLOAD_SIZE) : (window / MAX_PAYLOAD_SIZE + 1);
+
 	ack_packs_sent++;
 	last_ack_sent = ackn;
 	seq_expecting = ackn;
@@ -347,7 +353,7 @@ int main (int argc, char ** argv)
 		}
 		else if(state == states.LISTENING)
 		{
-			if(getWindowSize() > MIN_WINDOW_SIZE && seqn != 0)
+			if((chunks_recv == chunks_expecting || getWindowSize() == RECV_BUFFER_SIZE) && seqn != 0)
 			{
 				sendAckPacket(seq_expecting);
 			}
@@ -366,6 +372,7 @@ int main (int argc, char ** argv)
 				emptyBufferToFile();
 				continue;
 			}
+			chunks_recv++;
 			state = states.RECEIVED;
 		}
 		else if(state == states.EMPTY_BUFFER)
@@ -474,7 +481,7 @@ int main (int argc, char ** argv)
 		else if(state == states.FINISH)
 		{
 			//shouldn't ever be in here
-			state == states.RESET;
+			state = states.RESET;
 		}
 		else if(state == states.RESET)
 		{
