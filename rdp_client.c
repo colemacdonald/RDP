@@ -406,8 +406,13 @@ int main (int argc, char ** argv)
 
 				if(seqn != seq_expecting)
 				{
+					unsigned long long tmpl = getTimeMS();
 					printLogLineRecv(3, iTypes.DAT, seqn, length);
-					sendAckPacket(seq_expecting);
+					if(chunks_recv >= chunks_expecting || (recv_timer + 2*pkt_timeout < tmpl && recv_timer != 0))
+					{
+						sendAckPacket(seq_expecting);
+					}
+					//sendAckPacket(seq_expecting);
 				}
 				else
 				{
