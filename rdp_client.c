@@ -347,10 +347,8 @@ int main (int argc, char ** argv)
 		else if(state == states.LISTENING)
 		{
 			unsigned long long tmp = getTimeMS();
-			if(chunks_recv >= chunks_expecting || recv_timer + pkt_timeout < tmp)
+			if(chunks_recv >= chunks_expecting || (recv_timer + 2*pkt_timeout < tmp && recv_timer != 0))
 			{
-				if(recv_timer + pkt_timeout < tmp)
-					printf("timer: %llu --- now: %llu\n", recv_timer, tmp);
 				sendAckPacket(seq_expecting);
 			}
 
