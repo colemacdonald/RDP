@@ -345,7 +345,7 @@ int main (int argc, char ** argv)
 		}
 		else if(state == states.LISTENING)
 		{
-			if((chunks_recv == chunks_expecting || /*getWindowSize() > MIN_WINDOW_SIZE*/) && seqn != 0)
+			if((chunks_recv == chunks_expecting /*|| getWindowSize() > MIN_WINDOW_SIZE*/) && seqn != 0)
 			{
 				sendAckPacket(seq_expecting);
 			}
@@ -399,7 +399,7 @@ int main (int argc, char ** argv)
 			{
 				bytes_recv += length;
 				packs_recv++;
-				
+
 				if(seqn < seq_expecting)
 				{
 					printLogLineRecv(3, iTypes.DAT, seqn, length);
