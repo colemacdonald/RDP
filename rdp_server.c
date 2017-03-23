@@ -548,12 +548,12 @@ int main( int argc, char ** argv )
 				int sent;
 				for(sent = 0; sent < wsize; sent += MAX_PAYLOAD_SIZE)
 				{
-					if(sockReady4Recv())
+					/*if(sockReady4Recv())
 					{
 						state = states.RECEIVED;
 						sent = wsize;
 					}
-					else
+					else*/
 						sendDataPacket(ackn + sent, MAX_PAYLOAD_SIZE, file_data);
 				}
 			}
