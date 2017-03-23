@@ -528,6 +528,7 @@ int main( int argc, char ** argv )
 		else if(state == states.RECEIVED)
 		{
 			//printf("recvd:\n%s\n", request);
+
 			pkt_timeout = INIT_PKT_TO;
 			connected = TRUE;
 
@@ -549,7 +550,12 @@ int main( int argc, char ** argv )
 				if(ackn > last_ack)
 					printLogLineRecv(2, iTypes.ACK, ackn, wsize);
 				else
-					printLogLineRecv(3, iTypes.ACK, ackn, wsize);	
+					printLogLineRecv(3, iTypes.ACK, ackn, wsize);
+
+				if(sockReady4Recv())
+				{
+					continue;
+				}	
 			}
 			else if(type == iTypes.RST)
 			{
