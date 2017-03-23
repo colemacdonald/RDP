@@ -236,9 +236,9 @@ int getTimeMS()
     s = time(NULL);
 
     //s  = spec.tv_sec;
-    ms = spec.tv_nsec / 1.0e6; // Convert nanoseconds to milliseconds
+    //ms = spec.tv_nsec / 1.0e6; // Convert nanoseconds to milliseconds
 
-    //ms = (uintmax_t)s;
+    ms = (uintmax_t)s;
 
     return ms;
 }

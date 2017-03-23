@@ -272,14 +272,6 @@ int parse_packet_payload(char * recv, char * buffer, int length)
 	int pos = strcspn(recv, "\r\n") + 4;
 	int len = strlen(recv) - pos;
 
-	bytes_recv += len;
-	packs_recv++;
-
-	if(seqn == seq_expecting)
-	{
-		unique_bytes_recv += len;
-		unique_packs_recv++;
-	}
 	if(length != len)
 	{
 		//printf("client, line 192: length does not match. Header: %d, Payload: %d\n", length, len);
@@ -406,9 +398,18 @@ int main (int argc, char ** argv)
 			if(type == iTypes.DAT)
 			{
 				if(seqn < seq_expecting)
+				{
+					bytes_recv += len;
+					packs_recv++;
 					printLogLineRecv(3, iTypes.DAT, seqn, length);
+				}
 				else
+				{
+					unique_bytes_recv += len;
+					unique_packs_recv++;
 					printLogLineRecv(2, iTypes.DAT, seqn, length);
+				}
+					
 
 				if(seqn == seq_expecting)
 				{

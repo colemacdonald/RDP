@@ -37,7 +37,7 @@ typedef struct states {
 #define _MAGIC_ 			"CSC361"
 #define SOCK_TIMEOUT_s 		0
 #define SOCK_TIMEOUT_us		200
-#define INIT_PKT_TO		    1000
+#define INIT_PKT_TO		    1
 #define MAX_PAYLOAD_SIZE 	990
 
 
