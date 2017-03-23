@@ -588,7 +588,16 @@ int main( int argc, char ** argv )
 			}
 			else
 			{
-				sendDataPacket(last_ack, MAX_PAYLOAD_SIZE, file_data);
+				for(sent = 0; sent < wsize; sent += MAX_PAYLOAD_SIZE)
+				{
+					if(sockReady4Recv())
+					{
+						state = states.RECEIVED;
+						sent = wsize;
+					}
+					else
+						sendDataPacket(last_ack + sent, MAX_PAYLOAD_SIZE, file_data);
+				}
 			}
 			state = states.LISTENING;
 		}
