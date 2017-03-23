@@ -595,6 +595,7 @@ int main( int argc, char ** argv )
 					{
 						state = states.RECEIVED;
 						sent = wsize;
+						continue;
 					}
 					else
 						sendDataPacket(last_ack + sent, MAX_PAYLOAD_SIZE, file_data);
