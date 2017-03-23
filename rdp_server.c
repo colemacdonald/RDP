@@ -343,7 +343,7 @@ int sendDataPacket(int seqn, int length, char * fdata)
 
 	int l;
 
-	if(seqn - seq0 > strlen(fdata))
+	//if(seqn - seq0 > strlen(fdata))
 
 	if(length > strlen(&fdata[seqn - seq0]))
 		l = strlen(&fdata[seqn - (seq0 + 1)]);
