@@ -41,6 +41,7 @@ int 	last_ack;
 int 	last_length;
 int 	last_window;
 int 	largest_syn_sent 		= 0;
+int 	fin_to					= 0;
 
 //char *	file_data;
 int 	file_size;
@@ -561,7 +562,7 @@ int main( int argc, char ** argv )
 		}
 		else if(state == states.FINISH)
 		{
-			if(ackn != final_ack_expected)
+			if(ackn != final_ack_expected || fin_to > 4)
 			{
 				state = states.LISTENING;
 				sendFIN(ackn);
@@ -590,6 +591,7 @@ int main( int argc, char ** argv )
 			else if(fileTranserComplete(last_ack))
 			{
 				state = states.FINISH;
+				fin_to++;
 				continue;
 			}
 			else
