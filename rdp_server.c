@@ -556,6 +556,7 @@ int main( int argc, char ** argv )
 					else*/
 						sendDataPacket(ackn + sent, MAX_PAYLOAD_SIZE, file_data);
 				}
+				state = states.LISTENING;
 			}
 			else
 				state = states.FINISH;
