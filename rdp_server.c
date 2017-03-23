@@ -442,7 +442,6 @@ int sockReady4Recv()
 
 int main( int argc, char ** argv )
 {
-	printf("us: %llu\n", getTimeMS());
 	if( argc != 6)
 	{
 		ip_s = "192.168.1.100";
@@ -461,8 +460,6 @@ int main( int argc, char ** argv )
 		port_r = argv[4];
 		f_to_send = argv[5];
 	}
-
-	printf("us: %llu\n", getTimeMS());
 
 	if(!fileExists(f_to_send))
 	{
@@ -491,8 +488,6 @@ int main( int argc, char ** argv )
 	int state = states.UNCONNECTED;
 
 	int finished = FALSE;
-
-	printf("us: %llu\n", getTimeMS());
 
 	start_time = getTimeS();
 
@@ -666,7 +661,6 @@ int main( int argc, char ** argv )
 	
 	finish_time = getTimeS();
 	printSummary();
-	printf("us: %llu\n", getTimeMS());
 	close(sock);
 
 	return EXIT_SUCCESS;
