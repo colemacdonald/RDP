@@ -345,7 +345,7 @@ int main (int argc, char ** argv)
 		}
 		else if(state == states.LISTENING)
 		{
-			if((chunks_recv == chunks_expecting /*|| getWindowSize() > MIN_WINDOW_SIZE*/) && seqn != 0)
+			if((chunks_recv == chunks_expecting || getWindowSize() > MIN_WINDOW_SIZE) && seqn != 0)
 			{
 				sendAckPacket(seq_expecting);
 			}
