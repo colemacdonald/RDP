@@ -412,13 +412,13 @@ int main (int argc, char ** argv)
 
 				if(seqn == seq_expecting)
 				{
-					if(length < RECV_BUFFER_SIZE - buffer_used)
+					if(length < RECV_BUFFER_SIZE - strlen(filebuffer))
 					{
 						if(parse_packet_payload(request, filebuffer, length))
 						{
 							seq_expecting = seqn + length;
-							/*if(window < MIN_WINDOW_SIZE)
-								sendAckPacket(seq_expecting);*/
+							if(window < MIN_WINDOW_SIZE)
+								sendAckPacket(seq_expecting);
 						}
 						else
 						{
