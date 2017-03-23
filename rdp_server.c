@@ -552,10 +552,10 @@ int main( int argc, char ** argv )
 				else
 					printLogLineRecv(3, iTypes.ACK, ackn, wsize);
 
-				if(sockReady4Recv())
+				/*if(sockReady4Recv())
 				{
 					continue;
-				}	
+				}	*/
 			}
 			else if(type == iTypes.RST)
 			{
