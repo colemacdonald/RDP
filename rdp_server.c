@@ -617,7 +617,7 @@ int main( int argc, char ** argv )
 	
 	finish_time = getTimeS();
 	printSummary();
-
+	printf("us: %llu\n", getTimeMS());
 	close(sock);
 
 	return EXIT_SUCCESS;
