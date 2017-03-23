@@ -67,7 +67,7 @@ int 	rst_packs_sent 		= 0;
 int 	start_time			= 0;
 int 	finish_time 		= 0;
 
-int 	chunks_expecting	= 0;
+int 	chunks_expecting	= -1;
 int 	chunks_recv			= 0;
 ////////////////////////////////////////////////////////////////////////////////////////////
 //									HELPER FUNCTIONS
@@ -345,7 +345,7 @@ int main (int argc, char ** argv)
 		}
 		else if(state == states.LISTENING)
 		{
-			if((chunks_recv == chunks_expecting || getWindowSize() > MIN_WINDOW_SIZE) && seqn != 0)
+			if((chunks_recv == chunks_expecting/* || getWindowSize() > MIN_WINDOW_SIZE) && seqn != 0*/)
 			{
 				sendAckPacket(seq_expecting);
 			}
@@ -411,28 +411,35 @@ int main (int argc, char ** argv)
 					printLogLineRecv(2, iTypes.DAT, seqn, length);
 				}
 					
-
+				//right packet
 				if(seqn == seq_expecting)
 				{
+					//have room
 					if(length < RECV_BUFFER_SIZE - strlen(filebuffer))
 					{
+						//payload checks out
 						if(parse_packet_payload(request, filebuffer, length))
 						{
 							seq_expecting = seqn + length;
 							if(window < MIN_WINDOW_SIZE)
+							{
 								sendAckPacket(seq_expecting);
+								emptyBufferToFile();
+								sendAckPacket(seq_expecting);
+							}
+								
 						}
-						else
+						else //cant parse payload
 						{
 							//printf("resending 1\n");
 							resendLastAck();
 						}
 					}
-					else
+					else //don't have room
 						sendAckPacket(seq_expecting);
 				}
-				else
-					sendAckPacket(seq_expecting);
+				/*else //bad packet
+					sendAckPacket(seq_expecting);*/
 			}
 			else if(type == iTypes.SYN)
 			{
