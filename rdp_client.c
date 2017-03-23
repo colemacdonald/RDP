@@ -349,8 +349,7 @@ int main (int argc, char ** argv)
 			unsigned long long tmp = getTimeMS();
 			if(chunks_recv >= chunks_expecting || (recv_timer + 2*pkt_timeout < tmp && recv_timer != 0))
 			{
-				if(recv_timer + 2*pkt_timeout < tmp)
-					printf("to\n");
+				printf("here\n");
 				sendAckPacket(seq_expecting);
 			}
 
