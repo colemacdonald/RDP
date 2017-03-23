@@ -406,6 +406,7 @@ int sockReady4Recv()
 
 int main( int argc, char ** argv )
 {
+	printf("us: %d\n", getTimeMS());
 	if( argc != 6)
 	{
 		ip_s = "192.168.1.100";
