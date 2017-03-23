@@ -345,7 +345,7 @@ int main (int argc, char ** argv)
 		}
 		else if(state == states.LISTENING)
 		{
-			if(chunks_recv >= chunks_expecting / 2)
+			if(chunks_recv >= 0.75 * chunks_expecting)
 			{
 				sendAckPacket(seq_expecting);
 			}
