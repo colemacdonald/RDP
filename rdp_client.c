@@ -68,8 +68,8 @@ int 	rst_packs_sent 		= 0;
 int 	start_time			= 0;
 int 	finish_time 		= 0;
 
-int 	chunks_expecting	= -1;
-int 	chunks_recv			= 0;
+int 	chunks_expecting	= 0;
+int 	chunks_recv			= -1;
 ////////////////////////////////////////////////////////////////////////////////////////////
 //									HELPER FUNCTIONS
 ////////////////////////////////////////////////////////////////////////////////////////////
@@ -346,7 +346,7 @@ int main (int argc, char ** argv)
 		}
 		else if(state == states.LISTENING)
 		{
-			if(chunks_recv >= chunks_expecting || recv_timer + pkt_timeout > getTimeMS())
+			if(chunks_recv >= chunks_expecting || recv_timer + 2 * pkt_timeout > getTimeMS())
 			{
 				sendAckPacket(seq_expecting);
 			}
