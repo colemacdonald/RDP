@@ -227,9 +227,9 @@ int typeStrToInt(char * recv)
 	}
 }
 
-int getTimeMS()
+unsigned long long getTimeMS()
 {
-	uintmax_t       ms; // Milliseconds
+	/*uintmax_t       ms; // Milliseconds
     time_t          s;  // Seconds
     struct timespec spec;
 
@@ -240,7 +240,17 @@ int getTimeMS()
 
     ms = (uintmax_t)s;
 
-    return ms;
+    return ms;*/
+
+    struct timeval tv;
+
+	gettimeofday(&tv, NULL);
+
+	unsigned long long millisecondsSinceEpoch = 
+		(unsigned long long)(tv.tv_sec) * 1000 + 
+		(unsigned long long)(tv.tv_usec) / 1000;
+
+	return millisecondsSinceEpoch;
 }
 
 int getTimeS()

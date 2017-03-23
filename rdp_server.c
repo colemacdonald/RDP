@@ -56,7 +56,7 @@ socklen_t 	fromlen;
 char 		request[BUFFER_SIZE];
 
 int 		pkt_timeout 		= INIT_PKT_TO;
-int 		timer;
+unsigned long long 		timer;
 
 int 	total_data_bytes_sent 	= 0;
 int 	unique_data_bytes_sent 	= 0;
