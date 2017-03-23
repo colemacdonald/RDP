@@ -399,7 +399,7 @@ int main (int argc, char ** argv)
 			{
 				if(seqn < seq_expecting)
 				{
-					bytes_recv += len;
+					bytes_recv += length;
 					packs_recv++;
 					printLogLineRecv(3, iTypes.DAT, seqn, length);
 				}
