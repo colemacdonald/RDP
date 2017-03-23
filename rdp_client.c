@@ -426,8 +426,8 @@ int main (int argc, char ** argv)
 							resendLastAck();
 						}
 					}
-					/*else
-						sendAckPacket(seq_expecting);*/
+					else
+						sendAckPacket(seq_expecting);
 				}
 				else
 					sendAckPacket(seq_expecting);
