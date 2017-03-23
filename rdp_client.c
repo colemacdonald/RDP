@@ -346,7 +346,7 @@ int main (int argc, char ** argv)
 		}
 		else if(state == states.LISTENING)
 		{
-			if(chunks_recv => chunks_expecting || recv_timer + pkt_timeout > getTimeMS())
+			if(chunks_recv >= chunks_expecting || recv_timer + pkt_timeout > getTimeMS())
 			{
 				sendAckPacket(seq_expecting);
 			}
