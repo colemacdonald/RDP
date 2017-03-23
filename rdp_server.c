@@ -343,6 +343,8 @@ int sendDataPacket(int seqn, int length, char * fdata)
 
 	int l;
 
+	if(seqn - seq0 > strlen(fdata))
+
 	if(length > strlen(&fdata[seqn - seq0]))
 		l = strlen(&fdata[seqn - (seq0 + 1)]);
 	else
@@ -354,6 +356,7 @@ int sendDataPacket(int seqn, int length, char * fdata)
 
 	//char payload[length + 1];
 	// +1 for syn
+	printf("here");
 	strncat(header, &fdata[seqn - (seq0 + 1)], l);
 	strcat(header, "\0");
 
@@ -507,7 +510,6 @@ int main( int argc, char ** argv )
 		{
 			if(timer + pkt_timeout < getTimeMS())
 			{
-				printf("TIMEOUT\n");
 				state = states.TIMEOUT;
 				continue;
 			}
