@@ -403,6 +403,7 @@ int main (int argc, char ** argv)
 				if(seqn < seq_expecting)
 				{
 					printLogLineRecv(3, iTypes.DAT, seqn, length);
+					sendAckPacket(seq_expecting);
 				}
 				else
 				{
