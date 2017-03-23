@@ -52,8 +52,9 @@ char 		request[BUFFER_SIZE];
 
 FILE * 		fp;
 
-int 		timer 			= 0;
-int 		pkt_timeout 	= INIT_PKT_TO;
+int 		pkt_timeout 		= INIT_PKT_TO;
+unsigned long long 		timer;
+unsigned long long		recv_timer;
 
 int 	bytes_recv 			= 0;
 int 	unique_bytes_recv 	= 0;
@@ -345,7 +346,7 @@ int main (int argc, char ** argv)
 		}
 		else if(state == states.LISTENING)
 		{
-			if(chunks_recv >= 0.5 * chunks_expecting)
+			if(chunks_recv => chunks_expecting || recv_timer + pkt_timeout > getTimeMS())
 			{
 				sendAckPacket(seq_expecting);
 			}
@@ -380,6 +381,7 @@ int main (int argc, char ** argv)
 		{
 			//printf("recvd:\n%s\n", request);
 
+			recv_timer = getTimeMS();
 			pkt_timeout = INIT_PKT_TO;
 
 			char tmp[strlen(request) + 1];
