@@ -404,7 +404,7 @@ int main (int argc, char ** argv)
 				bytes_recv += length;
 				packs_recv++;
 
-				if(seqn < seq_expecting)
+				if(seqn != seq_expecting)
 				{
 					printLogLineRecv(3, iTypes.DAT, seqn, length);
 					sendAckPacket(seq_expecting);
