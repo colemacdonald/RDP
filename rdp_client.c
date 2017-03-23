@@ -397,10 +397,11 @@ int main (int argc, char ** argv)
 
 			if(type == iTypes.DAT)
 			{
+				bytes_recv += length;
+				packs_recv++;
+				
 				if(seqn < seq_expecting)
 				{
-					bytes_recv += length;
-					packs_recv++;
 					printLogLineRecv(3, iTypes.DAT, seqn, length);
 				}
 				else
