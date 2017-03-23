@@ -31,7 +31,8 @@ void getTimeString(char * buffer)
 	time (&rawtime);
 	timeinfo = localtime (&rawtime);
 
-	strftime (buffer, 80, "%b %d %T", timeinfo);
+	//strftime (buffer, 80, "%b %d %T", timeinfo);
+	strcpy(buffer, asctime(timeinfo));
 }
 
 void strToUpper(char * str)
