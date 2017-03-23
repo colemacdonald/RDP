@@ -525,7 +525,7 @@ int main( int argc, char ** argv )
 					printLogLineRecv(3, iTypes.RST, ackn, wsize);
 			}
 
-			if(ackn > last_ack + last_window && ackn != seq0 + 1)
+			if(ackn > last_ack + last_window + MAX_PAYLOAD_SIZE && ackn != seq0 + 1)
 			{
 				state = states.RESET;
 				continue;
