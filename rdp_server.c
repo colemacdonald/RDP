@@ -587,6 +587,11 @@ int main( int argc, char ** argv )
 			{
 				sendSYN();
 			}
+			else if(fileTranserComplete(last_ack))
+			{
+				state = states.FINISH;
+				continue;
+			}
 			else
 			{
 				int sent;
