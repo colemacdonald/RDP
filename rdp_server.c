@@ -45,6 +45,7 @@ int 	largest_syn_sent 		= 0;
 //char *	file_data;
 int 	file_size;
 int 	final_ack_expected		= 0;
+int 	rst_seqn				= -2;
 
 
 int 		type;
@@ -405,23 +406,24 @@ int sockReady4Recv()
 
 int main( int argc, char ** argv )
 {
-	/*if( argc != 6)
+	if( argc != 6)
 	{
-		printf("Incorrect number of arguments. Run as follows:\n ./sws <port> <directory>\n");
-		return EXIT_FAILURE;
-	}*/
+		ip_s = "192.168.1.100";
+		port_s = "8080";
+		ip_r = "10.10.1.100";
+		port_r = "8080";
+		f_to_send = "public/big.txt";
 
-	/*ip_s = argv[1];
-	port_s = argv[2];
-	ip_r = argv[3];
-	port_r = argv[4];
-	f_to_send = argv[5];*/
-
-	ip_s = "192.168.1.100";
-	port_s = "8080";
-	ip_r = "10.10.1.100";
-	port_r = "8080";
-	f_to_send = "public/big.txt";
+		//TODO: Uncomment
+		//printf("Incorrect number of arguments. Run as follows:\n ./sws <port> <directory>\n");
+		//return EXIT_FAILURE;
+	} else {
+		ip_s = argv[1];
+		port_s = argv[2];
+		ip_r = argv[3];
+		port_r = argv[4];
+		f_to_send = argv[5];
+	}
 
 	if(!fileExists(f_to_send))
 	{
@@ -450,6 +452,8 @@ int main( int argc, char ** argv )
 	int state = states.UNCONNECTED;
 
 	int finished = FALSE;
+
+	printf("us: %d\n", getTimeMS());
 
 	start_time = getTimeS();
 
@@ -522,7 +526,6 @@ int main( int argc, char ** argv )
 			if(ackn > last_ack + last_window && ackn != seq0 + 1)
 			{
 				state = states.RESET;
-				printf("rst\n");
 				continue;
 			}
 
@@ -566,20 +569,16 @@ int main( int argc, char ** argv )
 		else if(state == states.RESET)
 		{
 			close(sock);
-
-			//TODO: reset file information, close and reopen file?
-
 			state = states.UNCONNECTED;
 		}
 		else if(state == states.TIMEOUT)
 		{
 			//resend packets
 			pkt_timeout = 2 * pkt_timeout;
-			int sent = 0;
 			if(sockReady4Recv())
 			{
 				state = states.RECEIVED;
-				sent = wsize;
+				continue;
 			}
 			else if(!connected)
 			{
@@ -587,7 +586,7 @@ int main( int argc, char ** argv )
 			}
 			else
 			{
-				sendDataPacket(last_ack + sent, MAX_PAYLOAD_SIZE, file_data);
+				sendDataPacket(last_ack, MAX_PAYLOAD_SIZE, file_data);
 			}
 			state = states.LISTENING;
 		}

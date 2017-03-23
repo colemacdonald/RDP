@@ -304,15 +304,21 @@ int resendLastAck()
 
 int main (int argc, char ** argv)
 {
-	/*if(argc != 4)
+	if(argc != 4)
 	{
-		printf("Incorrect number of arguments, run as follows:\n./rdpr ")
-		return EXIT_FAILUE;
-	}*/
+		ip_r 			= "10.10.1.100";
+		port_r 			= "8080";
+		file_save_name 	= "save.txt";
 
-	ip_r 			= "10.10.1.100";	//argv[1];
-	port_r 			= "8080"; 			//argv[2];
-	file_save_name 	= "save.txt";		//argv[3];
+		//TODO: Uncomment
+		//printf("Incorrect number of arguments, run as follows:\n./rdpr ")
+		//return EXIT_FAILUE;
+	} else
+	{
+		ip_r 			= argv[1];
+		port_r 			= argv[2];
+		file_save_name 	= argv[3];
+	}
 
 	fp = fopen(file_save_name, "w");
 	if(!fp)
@@ -467,7 +473,8 @@ int main (int argc, char ** argv)
 		}
 		else if(state == states.FINISH)
 		{
-			//might be uneeded
+			//shouldn't ever be in here
+			state == states.RESET;
 		}
 		else if(state == states.RESET)
 		{
@@ -481,9 +488,10 @@ int main (int argc, char ** argv)
 		}
 		else if(state == states.TIMEOUT)
 		{
-			//TODO: resend ack
-			//printf("in TO\n");
+			pkt_timeout = 2 * pkt_timeout;
+
 			resendLastAck();
+			state = states.LISTENING;
 		}
 		else
 		{
