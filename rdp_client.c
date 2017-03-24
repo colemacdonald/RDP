@@ -120,7 +120,7 @@ void printLogLineSend(int etype, int ptype, int num1, int num2)
 	else if(ptype == iTypes.ACK)
 		strcpy(pts, "ACK");
 
-	printf("%s %c %s:%s %s:%s %s %d %d\n", timestr, event, ip_s, port_s, ip_r, port_r, pts, num1, num2);
+	printf("%s.%llu %c %s:%s %s:%s %s %d %d\n", timestr, getTimeUS(), event, ip_s, port_s, ip_r, port_r, pts, num1, num2);
 }
 
 void printLogLineRecv(int type, int ptype, int num1, int num2)
@@ -151,7 +151,7 @@ void printLogLineRecv(int type, int ptype, int num1, int num2)
 	else if(ptype == iTypes.ACK)
 		strcpy(pts, "ACK");
 
-	printf("%s %c %s:%s %s:%s %s %d %d\n", timestr, event, ip_r, port_r, ip_s, port_s, pts, num1, num2);
+	printf("%s.%llu %c %s:%s %s:%s %s %d %d\n", timestr, getTimeUS(), event, ip_r, port_r, ip_s, port_s, pts, num1, num2);
 }
 
 int prepareSocket()
