@@ -31,8 +31,8 @@ void getTimeString(char * buffer)
 	time (&rawtime);
 	timeinfo = localtime (&rawtime);
 
-	//strftime (buffer, 80, "%b %d %T", timeinfo);
-	strcpy(buffer, asctime(timeinfo));
+	strftime (buffer, 80, "%b %d %T", timeinfo);
+	//strcpy(buffer, asctime(timeinfo));
 }
 
 void strToUpper(char * str)
@@ -252,6 +252,20 @@ unsigned long long getTimeMS()
 		(unsigned long long)(tv.tv_usec) / 1000;
 
 	return millisecondsSinceEpoch;
+}
+
+unsigned long long getTimeUS()
+{
+	uintmax_t       us; // micro
+    time_t          s;  // Seconds
+    struct timespec spec;
+
+    s = time(NULL);
+
+    s  = spec.tv_sec;
+    us = spec.tv_nsec / 1.0e3; // Convert nanoseconds to milliseconds
+
+    return us;
 }
 
 int getTimeS()

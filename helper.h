@@ -77,4 +77,6 @@ unsigned long long getTimeMS();
 
 int getTimeS();
 
+unsigned long long getTimeUS();
+
 #endif
