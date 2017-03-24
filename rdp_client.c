@@ -306,14 +306,10 @@ int main (int argc, char ** argv)
 {
 	if(argc != 4)
 	{
-		/*ip_r 			= "10.10.1.100";
-		port_r 			= "8080";
-		file_save_name 	= "save.txt";*/
-
-		//TODO: Uncomment
 		printf("Incorrect number of arguments, run as follows:\n./rdpr <receiver_ip> <receiver_port> <receiver_file_name>\n");
 		return EXIT_FAILURE;
-	} else
+	} 
+	else
 	{
 		ip_r 			= argv[1];
 		port_r 			= argv[2];
@@ -489,10 +485,6 @@ int main (int argc, char ** argv)
 				rst_packs_recv++;
 				state = states.RESET;
 			}
-			else
-			{
-				//TODO: UNKNOWN
-			}
 
 			state = states.LISTENING;
 		}
@@ -518,10 +510,6 @@ int main (int argc, char ** argv)
 			resendLastAck();
 			state = states.LISTENING;
 		}
-		else
-		{
-			//TODO: UNKNOWN
-		}// end if else...
 	}//end while
 
 	finish_time = getTimeS();

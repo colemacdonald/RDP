@@ -201,8 +201,6 @@ int prepareSocket()
 	ssize_t recsize;
 	socklen_t fromlen;
 
-	//TODO: Use reciever port and ip, connect instead of bind
-
 	memset(&sa_s, 0, sizeof sa_s);
 	sa_s.sin_family = AF_INET;
 	sa_s.sin_addr.s_addr = inet_addr(ip_s);//htonl( atoi(ip_s) );
@@ -448,16 +446,11 @@ int main( int argc, char ** argv )
 {
 	if( argc != 6)
 	{
-		/*ip_s = "192.168.1.100";
-		port_s = "8080";
-		ip_r = "10.10.1.100";
-		port_r = "8080";
-		f_to_send = "public/big.txt";*/
-
-		//TODO: Uncomment
 		printf("Incorrect number of arguments. Run as follows:\n ./rdps <sender_ip> <sender_port> <receiver_ip> <receiver_port> <sender_file_name>\n");
 		return EXIT_FAILURE;
-	} else {
+	} 
+	else 
+	{
 		ip_s = argv[1];
 		port_s = argv[2];
 		ip_r = argv[3];
@@ -576,8 +569,6 @@ int main( int argc, char ** argv )
 			last_ack = ackn;
 
 			state = states.SEND_DATA;
-
-			//TODO: do something else
 		}
 		else if(state == states.SEND_DATA)
 		{
@@ -664,7 +655,7 @@ int main( int argc, char ** argv )
 		}
 		else
 		{
-			//TODO: UNKNOWN
+			state = states.RESET;
 		}
 	}//end while
 	
