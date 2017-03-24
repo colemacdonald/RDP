@@ -312,7 +312,7 @@ int main (int argc, char ** argv)
 
 		//TODO: Uncomment
 		printf("Incorrect number of arguments, run as follows:\n./rdpr <receiver_ip> <receiver_port> <receiver_file_name>\n");
-		return EXIT_FAILUE;
+		return EXIT_FAILURE;
 	} else
 	{
 		ip_r 			= argv[1];
