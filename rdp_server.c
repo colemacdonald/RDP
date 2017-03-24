@@ -119,7 +119,7 @@ void printLogLineSend(int etype, int ptype, int num1, int num2)
 	else if(ptype == iTypes.FIN)
 		strcpy(pts, "FIN");
 
-	printf("%s.%.4llu %c %s:%s %s:%s %s %d %d\n", timestr, getTimeUS(), event, ip_s, port_s, ip_r, port_r, pts, num1, num2);
+	printf("%s.%3llu %c %s:%s %s:%s %s %d %d\n", timestr, getTimeUS(), event, ip_s, port_s, ip_r, port_r, pts, num1, num2);
 }
 
 void printLogLineRecv(int type, int ptype, int num1, int num2)
