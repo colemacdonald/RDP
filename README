@@ -36,6 +36,7 @@ The designed connection finish is also implemented as a two-way handshake and wo
 	2. Client responds with an ACK packet
 	3. Client closes socket and returns
 	4. Sender closes socket and returns
+	5. If the FIN packet times out 4 times, it is assumed that the client has shut down and the ack was dropped.
 
 
 	The initial sequence number is chosen randomly as to avoid collisions with any services that may have previously used the same port and ip.
@@ -47,14 +48,14 @@ The designed connection finish is also implemented as a two-way handshake and wo
 
 	The initial window size will be the size of the receiver buffer and will be reduced when the buffer is filled. When the buffer is full, it will be appended to the file in which the data is being stored - after which the buffer can be emptied and the window size reset.
 
-	On the sender side, ...
+	On the sender side, the entire file is read into memory before the first SYN packet is sent.
 
 4. How do you design and implement the error detection, notification and recovery? How to use timer? How many timers do you use? How to respond to the events at the sender and receiver side, respectively? How to ensure reliable data transfer?
 
 Errors will be detected through timeouts, sequence numbers, acknowledgement numbers, and comparing the payload length to the specified length in the packet header. 
 
 	Timout: If a timeout occurs, the packet that 'timedout' will be resent and the timer restarted (with an increased timeout value). Once the packet is successfully transfered the timeout value will be reset to the original.
-	I plan on using 1 timer, keeping track of the most recent 'group' of packets that have been sent out (since the amount of packets being sent at a time will vary based on the advertised window size).
+	I plan on using 1 timer on either side, keeping track of the most recent 'group' of packets that have been sent out (since the amount of packets being sent at a time will vary based on the advertised window size).
 
 	Sequence Numbers: If the sequence number of the packet received by the receiver is not the one it is expecting, it will drop the packet and resend the previous acknolodgement message sent - prompting the sender to resend the correct packet.
 

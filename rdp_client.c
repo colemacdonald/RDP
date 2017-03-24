@@ -306,13 +306,13 @@ int main (int argc, char ** argv)
 {
 	if(argc != 4)
 	{
-		ip_r 			= "10.10.1.100";
+		/*ip_r 			= "10.10.1.100";
 		port_r 			= "8080";
-		file_save_name 	= "save.txt";
+		file_save_name 	= "save.txt";*/
 
 		//TODO: Uncomment
-		//printf("Incorrect number of arguments, run as follows:\n./rdpr ")
-		//return EXIT_FAILUE;
+		printf("Incorrect number of arguments, run as follows:\n./rdpr <receiver_ip> <receiver_port> <receiver_file_name>\n");
+		return EXIT_FAILUE;
 	} else
 	{
 		ip_r 			= argv[1];

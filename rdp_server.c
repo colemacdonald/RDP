@@ -448,15 +448,15 @@ int main( int argc, char ** argv )
 {
 	if( argc != 6)
 	{
-		ip_s = "192.168.1.100";
+		/*ip_s = "192.168.1.100";
 		port_s = "8080";
 		ip_r = "10.10.1.100";
 		port_r = "8080";
-		f_to_send = "public/big.txt";
+		f_to_send = "public/big.txt";*/
 
 		//TODO: Uncomment
-		//printf("Incorrect number of arguments. Run as follows:\n ./sws <port> <directory>\n");
-		//return EXIT_FAILURE;
+		printf("Incorrect number of arguments. Run as follows:\n ./rdps <sender_ip> <sender_port> <receiver_ip> <receiver_port> <sender_file_name>\n");
+		return EXIT_FAILURE;
 	} else {
 		ip_s = argv[1];
 		port_s = argv[2];
