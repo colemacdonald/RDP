@@ -256,7 +256,7 @@ unsigned long long getTimeMS()
 
 unsigned long long getTimeUS()
 {
-	uintmax_t       us; // micro
+	/*uintmax_t       us; // micro
     time_t          s;  // Seconds
     struct timespec spec;
 
@@ -264,7 +264,13 @@ unsigned long long getTimeUS()
 
     s  = spec.tv_sec;
     us = spec.tv_nsec / 1.0e3; // Convert nanoseconds to milliseconds
+*/
 
+    struct timeval tv;
+
+	gettimeofday(&tv, NULL);
+
+	unsigned long long us = (unsigned long long)(tv.tv_usec);
     return us;
 }
 
